@@ -1,5 +1,6 @@
 using ProjectSpetses.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,15 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";  // Redirect here for login
+        options.LogoutPath = "/Logout"; // Define logout path if needed
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);  // Set session expiry time
+        options.AccessDeniedPath = "/Login/AccessDenied";   // Optional access denied path
+    });
 
 var app = builder.Build();
 

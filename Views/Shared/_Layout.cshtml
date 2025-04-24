@@ -20,20 +20,53 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-black"
+                               asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
+                               asp-action="@nameof(HomeController.Index)">
+                                Home
+                            </a>
+                            @*
+                                same thing as this but done dynamically
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            *@
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Explore" asp-action="Index">Explore</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Games" asp-action="Index">Games</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Logout">Logout</a>
-                        </li>
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            @* Navigation for guests (not logged in) *@
+                            <li class="nav-item">
+                                <a class="nav-link text-black"
+                                   asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
+                                   asp-action="@nameof(LoginController.Login)">
+                                    Login
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            @* Content for logged-in users *@ 
+                            <li class="nav-item">
+                                <a class="nav-link text-black"
+                                   asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                                   asp-action="@nameof(ExploreController.Index)">
+                                    Explore
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-black"
+                                   asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
+                                   asp-action="@nameof(GamesController.Index)">
+                                    Games
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-black"
+                                   asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
+                                   asp-action="@nameof(LoginController.Logout)">
+                                    Logout
+                                </a>
+                            </li>
+                        }
+                        
                     </ul>
                 </div>
             </div>
