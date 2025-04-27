@@ -1,0 +1,31 @@
+﻿@model List<ProjectSpetses.Models.Entities.Quiz_item>
+
+<h1>Quizzes</h1>
+<form asp-action="@nameof(GamesController.SubmitQuiz)" method="post">
+
+    @foreach (var quiz in Model)
+    {
+        <div>
+            <h3>@quiz.Description</h3>
+            <ul>
+                @foreach (var answer in quiz.Answers)
+                {
+                    <li>
+                        <input type="radio"
+							   id="@answer + @quiz.Section_Id"
+							   name="@quiz.Section_Id"
+                               value="@(quiz.Solution == answer ? "True" : "False")"
+                               required />
+                        <!-- The Value is visible if you inspect the browser page, this is a feature -->
+                        <label for="@answer + @quiz.Section_Id">@answer</label>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+    <button type="submit">Submit</button>
+</form>
+
+
+
