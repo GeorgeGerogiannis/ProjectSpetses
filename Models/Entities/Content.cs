@@ -2,9 +2,11 @@
 {
     public class Content
     {
-        public required Guid Id { get; set; }
-        public required Guid SectionId { get; set; }
+        public required ushort Id { get; set; }
+        public required string Text { get; set; }
+        public required ushort CategoryId { get; set; }
+        public required ushort Page { get; set; }
 
-        public Section Section { get; set; }
+        public Category Category { get; set; }
     }
 }

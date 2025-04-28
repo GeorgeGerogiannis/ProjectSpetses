@@ -1,0 +1,55 @@
+﻿@model CategoryViewModel
+@{
+    ViewData["Title"] = Model.CategoryName;
+}
+
+<link rel="stylesheet" href="~/css/category.css" />
+
+<h2>@Model.CategoryName</h2>
+<p>Page: @(Model.Content.Page)/@Model.PageCount</p>
+<p>@Model.Content.Text</p>
+<div class="button-row">
+    @if (Model.Content.Page > 1)
+    {
+        <a class="btn btn-primary"
+           asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+           asp-action="@nameof(ExploreController.Category)"
+           asp-route-sectionId="@Model.SectionId"
+           asp-route-Id="@Model.CategoryId"
+           asp-route-page="@(Model.Content.Page - 1)">
+            @Html.Raw("<- Προηγούμενη Σελίδα")
+        </a>
+    }
+    else
+    {
+        <a></a>
+    }
+
+    <a class="btn btn-primary"
+       asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+       asp-action="@nameof(ExploreController.Section)"
+       asp-route-Id="@Model.SectionId">
+        Πίσω στις Κατηγορίες
+    </a>
+
+    @if (Model.Content.Page < Model.PageCount)
+    {
+        <a class="btn btn-primary"
+           asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+           asp-action="@nameof(ExploreController.Category)"
+           asp-route-sectionId="@Model.SectionId"
+           asp-route-Id="@Model.CategoryId"
+           asp-route-page="@(Model.Content.Page + 1)">
+            @Html.Raw("Επόμενη Σελίδα ->")
+        </a>
+    }
+    else
+    {
+        <a class="btn btn-primary"
+           asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+           asp-action="@nameof(ExploreController.Section)"
+           asp-route-Id="@Model.SectionId">
+            Τέλος Κατηγορίας
+        </a>
+    }
+</div>

@@ -1,5 +1,45 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model SectionViewModel
 @{
+    ViewData["Title"] = Model.SectionName;
+}
+
+<link rel="stylesheet" href="~/css/section.css" />
+
+<h2>@Model.SectionName</h2>
+@if (Model.Categories.Count == 0)
+{
+    <div class="text-center">
+        <h2 class="display-4">Αυτή η ενότητα δεν περιέχει κατηγορίες</h2>
+    </div>
+}
+else
+{
+    <div class="category-grid">
+        @foreach (var category in Model.Categories)
+        {
+            <div class="category-card">
+                <div class="category-thumbnail">
+                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                       asp-action="@nameof(ExploreController.Category)"
+                       asp-route-sectionId="@Model.SectionId"
+                       asp-route-Id="@category.Id"
+                       asp-route-page="1">
+                        <img src="@category.ImageUrl" alt="@category.Name" />
+                    </a>
+                </div>
+                <div class="category-info">
+                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                       asp-action="@nameof(ExploreController.Category)"
+                       asp-route-sectionId="@Model.SectionId"
+                       asp-route-Id="@category.Id"
+                       asp-route-page="1">
+                        <h3 class="category-title">
+                            @category.Name
+                        </h3>
+                        <p class="category-description">@category.Description</p>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
 }

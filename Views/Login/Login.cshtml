@@ -1,9 +1,9 @@
 ﻿@model LoginViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Σύνδεση";
 }
 
-<h2>Login</h2>
+<h2>Σύνδεθείτε</h2>
 
 <div class="mt-3">
     <form asp-action="@nameof(LoginController.Login)" method="post">
@@ -14,21 +14,21 @@
             </div>
         }
         <div class="mt-3">
-            <label class="form-label">Username</label>
+            <label class="form-label">Όνομα Χρήστη</label>
             <input type="text" class="form-control" asp-for="Username" />
             <span asp-validation-for="Username" class="text-danger"></span>
         </div>
         <div class="mt-3">
-            <label class="form-label">Password</label>
+            <label class="form-label">Κωδικός Πρόσβασης</label>
             <input type="password" class="form-control" asp-for="Password" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Login</button>
+            <button type="submit" class="btn btn-primary">Σύνδεση</button>
         </div>
     </form>
 
     <div class="mt-3">
-        <a asp-action="@nameof(LoginController.Register)">Sign Up</a>
+        <a asp-action="@nameof(LoginController.Register)">Δημιουργία Λογαριασμού</a>
     </div>
 </div>

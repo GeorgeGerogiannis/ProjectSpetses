@@ -22,29 +22,71 @@ namespace ProjectSpetses.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.Category", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("SectionId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SectionId");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Page")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Content");
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Section", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -59,16 +101,9 @@ namespace ProjectSpetses.Migrations
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Stats", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Stats");
                 });
@@ -87,9 +122,6 @@ namespace ProjectSpetses.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("StatsId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -99,7 +131,7 @@ namespace ProjectSpetses.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.Category", b =>
                 {
                     b.HasOne("ProjectSpetses.Models.Entities.Section", "Section")
                         .WithMany()
@@ -110,15 +142,32 @@ namespace ProjectSpetses.Migrations
                     b.Navigation("Section");
                 });
 
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
+                {
+                    b.HasOne("ProjectSpetses.Models.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Stats", b =>
                 {
                     b.HasOne("ProjectSpetses.Models.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("ProjectSpetses.Models.Entities.Stats", "UserId")
+                        .WithOne("Stats")
+                        .HasForeignKey("ProjectSpetses.Models.Entities.Stats", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.User", b =>
+                {
+                    b.Navigation("Stats")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ProjectSpetses</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ProjectSpetses.styles.css" asp-append-version="true" />
@@ -12,7 +13,11 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ProjectSpetses</a>
+                <a class="navbar-brand text-black"
+                   asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
+                   asp-action="@nameof(HomeController.Index)">
+                    ProjectΣπέτσες
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -23,7 +28,7 @@
                             <a class="nav-link text-black"
                                asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
                                asp-action="@nameof(HomeController.Index)">
-                                Home
+                                Αρχική
                             </a>
                             @*
                                 same thing as this but done dynamically
@@ -37,7 +42,7 @@
                                 <a class="nav-link text-black"
                                    asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(LoginController.Login)">
-                                    Login
+                                    Σύνδεση
                                 </a>
                             </li>
                         }
@@ -48,7 +53,7 @@
                                 <a class="nav-link text-black"
                                    asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(ExploreController.Index)">
-                                    Explore
+                                    Ενότητες
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -62,16 +67,16 @@
                                 <a class="nav-link text-black"
                                    asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(LoginController.Logout)">
-                                    Logout
+                                    Αποσύνδεση
                                 </a>
                             </li>
                         }
-                        
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -83,6 +88,7 @@
             &copy; 2025 - ProjectSpetses - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

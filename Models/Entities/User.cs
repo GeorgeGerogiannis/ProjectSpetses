@@ -6,6 +6,7 @@
         public required string Username { get; set; }
         public required string Password { get; set; }
         public required string Salt { get; set; }
-        public required Guid StatsId { get; set; }
+
+        public Stats Stats { get; set; }
     }
 }

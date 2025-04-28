@@ -1,3 +1,48 @@
-﻿@{
-    ViewData["Title"] = "Explore";
+﻿@model List<Section>
+@{
+    ViewData["Title"] = "Ενότητες";
+}
+
+<link rel="stylesheet" href="~/css/explore.css" />
+
+@if (Model.Count == 0)
+{
+    <div class="text-center">
+        <h3 class="display-4">Δεν υπάρχουν ενότητες αυτή τη στιγμή</h3>
+    </div>
+}
+else
+{
+    <div>
+        <h2>Επιλέξτε Ενότητα</h2>
+        @* NOTE: section is a keyword (like @model), so avoid using it after '@'*@
+        @foreach (var exploreSection in Model)
+        {
+            <div class="section-card">
+                <div class="section-thumbnail">
+                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                       asp-action="@nameof(ExploreController.Section)"
+                       asp-route-Id="@exploreSection.Id">
+                        <img src="@exploreSection.ImageUrl" class="img-fluid rounded-start" alt="@exploreSection.Name">
+                    </a>
+                </div>
+                <div class="section-details">
+                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                       asp-action="@nameof(ExploreController.Section)"
+                       asp-route-Id="@exploreSection.Id">
+                        <div class="section-title">
+                            @exploreSection.Name
+                        </div>
+                        <p class="section-description">@exploreSection.Description</p>
+                    </a>
+                </div>
+                <a class="btn btn-primary"
+                   asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                   asp-action="@nameof(ExploreController.Section)"
+                   asp-route-Id="@exploreSection.Id">
+                    Δείτε λεπτομέρειες
+                </a>
+            </div>
+        }
+    </div>
 }

@@ -3,6 +3,29 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h2>
+            Καλωσήρθατε, στο ProjectSpetses @User.Identity.Name!
+        </h2>
+        <p>
+            Μάθετε για τις Σπέτσες
+            <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+               asp-action="@nameof(ExploreController.Index)">
+                εδώ
+            </a>.
+        </p>
+    }
+    else
+    {
+        <h2>
+            Καλωσήρθατε! Παρακαλώ συνδεθείτε
+            <a asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
+               asp-action="@nameof(LoginController.Login)">
+                εδώ
+            </a>
+            για να απολαύσετε την εμπειρία μας.
+        </h2>
+    }
+    
 </div>

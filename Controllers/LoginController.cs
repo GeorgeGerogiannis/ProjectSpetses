@@ -15,12 +15,14 @@ namespace ProjectSpetses.Controllers
         private readonly ApplicationDbContext _dbContext = dbContext;
 
         [HttpGet]
+        [Route("Login")]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
+        [Route("Login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
@@ -58,12 +60,14 @@ namespace ProjectSpetses.Controllers
         }
 
         [HttpGet]
+        [Route("Register")]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [Route("Register")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel viewModel)
         {
@@ -89,22 +93,19 @@ namespace ProjectSpetses.Controllers
             var hashedPassword = obj.HashPassword(viewModel.Password, salt);
 
             var userId = Guid.NewGuid();
-            var statsId = Guid.NewGuid();
 
-            //create the user
+            //create the user and their stats
             var newUser = new User
             {
                 Id = userId,
                 Username = viewModel.Username,
                 Password = hashedPassword,
                 Salt = salt,
-                StatsId = statsId
             };
 
             var stats = new Stats
             {
-                Id = statsId,
-                UserId = userId
+                Id = userId
             };
 
             //add the user and the stats to the database
