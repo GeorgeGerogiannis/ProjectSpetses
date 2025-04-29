@@ -1,0 +1,26 @@
+﻿@model (List<ProjectSpetses.Models.Entities.Match_item>, List<string>)
+    )
+@{
+    var matchItems = Model.Item1;
+    var dropList = Model.Item2;
+}
+
+<h1>Word Match Game</h1>
+
+<form asp-action="@nameof(GamesController.SubmitWordMatch)" method="post">
+
+    @foreach (var item in matchItems)
+    {
+        <img src="@item.Image" alt="/images/placeholder.png" style="width:150px; height:auto;"></img>
+        <select name="@item.Section_Id">
+			<option value="">--Choose--</option>
+			@foreach (var option in dropList)
+			{
+                <option value="@(item.Solution == option ? "True" : "False")">@option</option>
+			}
+        </select>
+    }
+    <br>
+    <button type="submit">Submit</button>
+</form>
+
