@@ -11,8 +11,16 @@
     transition: transform 0.2s;
 }
 
-.section-card:hover {
-    transform: translateY(-2px);
+.section-card-link {
+    display: block;
+    text-decoration: none;
+    color: black;
+    transition: transform 0.2s ease;
+}
+
+.section-card-link:hover {
+    transform: translateY(-5px);
+    color: black;
 }
 
 .section-thumbnail {
@@ -30,11 +38,6 @@
     padding: 15px;
     flex-direction: column;
     justify-content: center;
-}
-
-.section-details > a {
-    color: black;
-    text-decoration: none;
 }
 
 .section-title {

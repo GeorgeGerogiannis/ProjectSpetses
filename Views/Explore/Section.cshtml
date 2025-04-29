@@ -17,29 +17,24 @@ else
     <div class="category-grid">
         @foreach (var category in Model.Categories)
         {
-            <div class="category-card">
-                <div class="category-thumbnail">
-                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                       asp-action="@nameof(ExploreController.Category)"
-                       asp-route-sectionId="@Model.SectionId"
-                       asp-route-Id="@category.Id"
-                       asp-route-page="1">
+            <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+               asp-action="@nameof(ExploreController.Category)"
+               asp-route-sectionId="@Model.SectionId"
+               asp-route-Id="@category.Id"
+               asp-route-page="1"
+               class="category-card-link">
+                <div class="category-card">
+                    <div class="category-thumbnail">
                         <img src="@category.ImageUrl" alt="@category.Name" />
-                    </a>
-                </div>
-                <div class="category-info">
-                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                       asp-action="@nameof(ExploreController.Category)"
-                       asp-route-sectionId="@Model.SectionId"
-                       asp-route-Id="@category.Id"
-                       asp-route-page="1">
+                    </div>
+                    <div class="category-info">
                         <h3 class="category-title">
                             @category.Name
                         </h3>
                         <p class="category-description">@category.Description</p>
-                    </a>
+                    </div>
                 </div>
-            </div>
+            </a>
         }
     </div>
 }

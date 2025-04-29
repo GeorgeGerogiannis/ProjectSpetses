@@ -18,31 +18,22 @@ else
         @* NOTE: section is a keyword (like @model), so avoid using it after '@'*@
         @foreach (var exploreSection in Model)
         {
-            <div class="section-card">
-                <div class="section-thumbnail">
-                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                       asp-action="@nameof(ExploreController.Section)"
-                       asp-route-Id="@exploreSection.Id">
+            <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+               asp-action="@nameof(ExploreController.Section)"
+               asp-route-Id="@exploreSection.Id"
+               class="section-card-link">
+                <div class="section-card">
+                    <div class="section-thumbnail">
                         <img src="@exploreSection.ImageUrl" class="img-fluid rounded-start" alt="@exploreSection.Name">
-                    </a>
-                </div>
-                <div class="section-details">
-                    <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                       asp-action="@nameof(ExploreController.Section)"
-                       asp-route-Id="@exploreSection.Id">
+                    </div>
+                    <div class="section-details">
                         <div class="section-title">
                             @exploreSection.Name
                         </div>
                         <p class="section-description">@exploreSection.Description</p>
-                    </a>
+                    </div>
                 </div>
-                <a class="btn btn-primary"
-                   asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                   asp-action="@nameof(ExploreController.Section)"
-                   asp-route-Id="@exploreSection.Id">
-                    Δείτε λεπτομέρειες
-                </a>
-            </div>
+            </a>
         }
     </div>
 }
