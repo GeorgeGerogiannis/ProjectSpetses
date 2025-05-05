@@ -1,0 +1,50 @@
+﻿.container {
+    position: relative;
+}
+
+.last-read-card {
+    position: absolute;
+    top: 0;
+    right: -100px;
+    width: 230px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.last-read-card-body {
+    padding: 1.25rem;
+}
+
+.last-read-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #333;
+}
+
+.last-read-card-text {
+    margin-bottom: 1rem;
+    white-space: pre-line;
+}
+
+.last-read-card .btn-primary {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+/* Media query for responsiveness */
+@media (max-width: 767px) {
+    .container {
+        padding-right: 15px; /* Reset padding on mobile */
+    }
+
+    .last-read-card {
+        position: relative;
+        width: 100%;
+        max-width: 300px;
+        margin: 20px auto;
+    }
+}

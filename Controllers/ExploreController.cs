@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
 using ProjectSpetses.Models;
-using System.Reflection.Metadata;
 
 namespace ProjectSpetses.Controllers
 {
@@ -77,6 +76,16 @@ namespace ProjectSpetses.Controllers
                 .Where(c => c.CategoryId == Id)
                 .CountAsync();
 
+            //get the current user stats
+            var stats = await _dbContext.Stats
+                .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+
+            //add the last read content to the user stats
+            //format: {sectionId}:{Id}:{page}
+            stats.LastRead = $"{sectionId}:{Id}:{page}";
+            await _dbContext.SaveChangesAsync();
+
+
             var model = new CategoryViewModel
             {
                 SectionId = sectionId,
@@ -87,6 +96,12 @@ namespace ProjectSpetses.Controllers
             };
 
             return View(model);
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            var currentUserId = User.FindFirst("User_id")?.Value;
+            return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
         }
     }
 }

@@ -1,8 +1,11 @@
-﻿@{
+﻿@model HomeViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
+<link rel="stylesheet" href="~/css/home.css" />
+
+<div class="container text-center">
     @if (User.Identity.IsAuthenticated)
     {
         <h2>
@@ -15,6 +18,28 @@
                 εδώ
             </a>.
         </p>
+
+        @if (Model != null)
+        {
+            <div class="last-read-card">
+                <div class="last-read-card-body">
+                    <h5 class="last-read-card-title">Που σταμάτησες τελευταία φορά?</h5>
+                    <p class="last-read-card-text">
+                        Ενότητα: @Model.SectionName
+                        Υποενότητα: @Model.CategoryName
+                        Σελίδα: @Model.Page
+                    </p>
+                    <a class="btn btn-primary"
+                       asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                       asp-action="@nameof(ExploreController.Category)"
+                       asp-route-sectionId="@Model.SectionId"
+                       asp-route-Id="@Model.CategoryId"
+                       asp-route-page="@Model.Page">
+                        Συνέχισε το διάβασμα
+                    </a>
+                </div>
+            </div>
+        }
     }
     else
     {
@@ -27,5 +52,4 @@
             για να απολαύσετε την εμπειρία μας.
         </h2>
     }
-    
 </div>
