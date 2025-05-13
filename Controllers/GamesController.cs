@@ -1,64 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProjectSpetses.Data;
 using ProjectSpetses.Models.Entities;
 
 namespace ProjectSpetses.Controllers
 {
-    public class GamesController : Controller
+    public class GamesController(ApplicationDbContext dbContext) : Controller
     {
+        //get access to the database
+        private readonly ApplicationDbContext _dbContext = dbContext;
+
         public IActionResult Index()
         {
             return View();
         }
-        public IActionResult Quiz()
+        public async Task<IActionResult> Quiz()
         {
             //This is adds the quiz items to the view
-            var quiz_items = GetQuizes();
-            return View(quiz_items);
-        }
-        private List<Quiz_item> GetQuizes()
-        {
+
             //This is where you do DB stuff
+            var quiz_items = await _dbContext.Quiz_items.ToListAsync();
+
             //Testing data
-            List<Quiz_item> quiz_items = new List<Quiz_item> {
-            new Quiz_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description = "What is the capital of Greece?",
-                Solution = "Athens",
-                Answers = new List<string>() { "Athens", "Thessaloniki", "Patras", "Heraklion" }
-            },
-            new Quiz_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description = "What is the capital of italy?",
-                Solution = "Rome",
-                Answers = new List<string>() { "Athens", "Rome", "Napoli", "Heraklion" }
-            },
-            new Quiz_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description = "What is the capital of Egypt?",
-                Solution = "Cairo",
-                Answers = new List<string>() { "Athens", "Nile", "Patras", "Cairo" }
-            },
-            new Quiz_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description = "What is the capital of UK?",
-                Solution = "London",
-                Answers = new List<string>() { "London", "Dublin", "Patras", "Heraklion" }
-            }
-            };
-            //End of Testing data
+            //here i select 4 quizes from the DB since we dont have a selection method yet
+            quiz_items = new List<Quiz_item> { quiz_items[0], quiz_items[1], quiz_items[2], quiz_items[3] };
 
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
             for (int i = 0; i < quiz_items.Count; i++)
             {
                 quiz_items[i].Answers = ShuffleList(quiz_items[i].Answers);
             }
-
-            return quiz_items;
+            return View(quiz_items);
         }
+        
         public async Task<IActionResult> SubmitQuiz()
         {
             //this is what we do with the quiz data

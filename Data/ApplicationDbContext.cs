@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Models.Entities;
 
 namespace ProjectSpetses.Data
@@ -16,6 +17,7 @@ namespace ProjectSpetses.Data
         public DbSet<Section> Sections { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Content> Content { get; set; }
+        public DbSet<Quiz_item> Quiz_items { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +38,9 @@ namespace ProjectSpetses.Data
             modelBuilder.Entity<Content>()
                 .HasKey(c => c.Id);
 
+            modelBuilder.Entity<Quiz_item>()
+                .HasKey(c => c.Id);
+
             modelBuilder.Entity<Stats>().HasOne(s => s.User)
                 .WithOne(s => s.Stats)
                 .HasForeignKey<Stats>(s => s.Id);
@@ -47,6 +52,16 @@ namespace ProjectSpetses.Data
             modelBuilder.Entity<Content>().HasOne(c => c.Category)
                 .WithMany()
                 .HasForeignKey(c => c.CategoryId);
+
+            modelBuilder.Entity<Quiz_item>().HasOne(c => c.Content)
+                .WithMany()
+                .HasForeignKey(c => c.ContentId);
+
+            modelBuilder.Entity<Quiz_item>()
+                .Property(q => q.Answers)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
 
             base.OnModelCreating(modelBuilder);
         }

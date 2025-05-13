@@ -12,12 +12,12 @@
                 {
                     <li>
                         <input type="radio"
-							   id="@quiz.Section_Id@answer" 
-							   name="@quiz.Section_Id"
+							   id="@quiz.Id@answer" 
+							   name="@quiz.Id"
                                value="@(quiz.Solution == answer ? "True" : "False")"
                                required />
                         <!-- The Value is visible if you inspect the browser page, this is a feature -->
-                        <label for="@quiz.Section_Id@answer">@answer</label>
+                        <label for="@quiz.Id@answer">@answer</label>
                     </li>
                 }
             </ul>
