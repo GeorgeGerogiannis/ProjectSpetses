@@ -39,44 +39,29 @@ namespace ProjectSpetses.Controllers
             //the quiz page doesn't save the data in any form yet (use asp-for= and a model)
             return null;
         }
-        public IActionResult WordMatch()
+        public async Task<IActionResult> WordMatch()
         {
-            var (Match_items, dropList) = GetWordMatches();
+            //This is where you do DB stuff
+            var Match_items = await _dbContext.Quiz_items.ToListAsync();
+
+            //Testing data
+            //here i select 4 quizes from the DB since we dont have a selection method yet
+            Match_items = new List<Quiz_item> { Match_items[0], Match_items[1], Match_items[2], Match_items[3] };
+
+            //get the drop list for the html
+            List<String> dropList = new List<String>();
+            foreach (var item in Match_items)
+            {
+                dropList.Add(item.Solution);
+            }
+            dropList = ShuffleList(dropList);
+
             return View((Match_items, dropList));
         }
         public (List<Match_item>, List<string>) GetWordMatches() 
         {
             //This is where you do DB stuff
             //add "/images/" by code, take the name and extension from DB
-
-            //Testing data
-            List<Match_item> Match_items = new List<Match_item> {
-                new Match_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Image = "/images/placeholder.png",
-                Solution = "Solution 1"
-            },
-                new Match_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Image = "/images/placeholder.png",
-                Solution = "Solution 2"
-            },
-                new Match_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Image = "/images/placeholder.png",
-                Solution = "Solution 3"
-            },
-                new Match_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Image = "/images/placeholder.png",
-                Solution = "Solution 4"
-                }
-            };
-            //End of Testing data
 
             //this makes a shuffled list of the solutions to be used in the drop down
             List<String> dropList = new List<String>();
@@ -94,69 +79,25 @@ namespace ProjectSpetses.Controllers
             //the WordMatch page doesn't save the data in any form yet (use asp-for= and a model)
             return null;
         }
-        public IActionResult FillBlank()
-        {
-            var quiz_items = GetBlanks();
-            return View(quiz_items);
-        }
-        private List<Blank_item> GetBlanks()
+        public async Task<IActionResult> FillBlank()
         {
             //This is where you do DB stuff
-            //Blank items are near identical to quiz items, when DB is developed we should consider merging these
+            var blank_items = await _dbContext.Blank_items.ToListAsync();
 
             //Testing data
-            List<Blank_item> quiz_items = new List<Blank_item> {
-                new Blank_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description1 = "Oranges are a ",
-                Description2 = "fruit?",
-                Solution = "yummy",
-                Answers = new List<string>() { "gross", "red", "blue", "unhealthy" }
-            },
-                new Blank_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description1 = "Italians live in ",
-                Description2 = " city?",
-                Solution = "Rome",
-                Answers = new List<string>() { "Athens", "Rome", "Napoli", "Heraklion" }
-            },
-                new Blank_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description1 = "Oranges are a ",
-                Description2 = "fruit?",
-                Solution = "Cairo",
-                Answers = new List<string>() { "Athens", "Nile", "Patras", "Cairo" }
-            },
-                new Blank_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description1 = "Oranges are a ",
-                Description2 = "fruit?",
-                Solution = "London",
-                Answers = new List<string>() { "London", "Dublin", "Patras", "Heraklion" }
-            },
-                new Blank_item
-            {
-                Section_Id = Guid.NewGuid(),
-                Description1 = "Oranges are a ",
-                Description2 = "fruit?",
-                Solution = "London",
-                Answers = new List<string>() { "London", "Dublin", "Patras", "Heraklion" }
-            }
-            };
-            //End of Testing data
+            //here i select 4 quizes from the DB since we dont have a selection method yet
+            //blank_items = new List<Quiz_item> { blank_items[0], blank_items[1], blank_items[2], blank_items[3] };
 
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
-            for (int i = 0; i < quiz_items.Count; i++)
+            for (int i = 0; i < blank_items.Count; i++)
             {
-                quiz_items[i].Answers = ShuffleList(quiz_items[i].Answers);
+                blank_items[i].Answers = ShuffleList(blank_items[i].Answers);
             }
 
-            return quiz_items;
+
+            return View(blank_items);
         }
+        
         public static List<T> ShuffleList<T>(List<T> list)
         {//this shuffles String lists to avoid obvious tests
             Random random = new Random();

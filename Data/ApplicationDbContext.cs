@@ -18,6 +18,8 @@ namespace ProjectSpetses.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Content> Content { get; set; }
         public DbSet<Quiz_item> Quiz_items { get; set; }
+        public DbSet<Blank_item> Blank_items { get; set; }
+        public DbSet<Match_item> Match_items { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,6 +43,12 @@ namespace ProjectSpetses.Data
             modelBuilder.Entity<Quiz_item>()
                 .HasKey(c => c.Id);
 
+            modelBuilder.Entity<Blank_item>()
+                .HasKey(c => c.Id);
+
+            modelBuilder.Entity<Match_item>()
+                .HasKey(c => c.Id);
+
             modelBuilder.Entity<Stats>().HasOne(s => s.User)
                 .WithOne(s => s.Stats)
                 .HasForeignKey<Stats>(s => s.Id);
@@ -57,7 +65,22 @@ namespace ProjectSpetses.Data
                 .WithMany()
                 .HasForeignKey(c => c.ContentId);
 
+            modelBuilder.Entity<Blank_item>().HasOne(c => c.Content)
+                .WithMany()
+                .HasForeignKey(c => c.ContentId);
+
+            modelBuilder.Entity<Match_item>().HasOne(c => c.Content)
+                .WithMany()
+                .HasForeignKey(c => c.ContentId);
+
+            //these work, trust me bro
             modelBuilder.Entity<Quiz_item>()
+                .Property(q => q.Answers)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
+
+            modelBuilder.Entity<Blank_item>()
                 .Property(q => q.Answers)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
