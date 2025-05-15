@@ -58,21 +58,6 @@ namespace ProjectSpetses.Controllers
 
             return View((Match_items, dropList));
         }
-        public (List<Match_item>, List<string>) GetWordMatches() 
-        {
-            //This is where you do DB stuff
-            //add "/images/" by code, take the name and extension from DB
-
-            //this makes a shuffled list of the solutions to be used in the drop down
-            List<String> dropList = new List<String>();
-            foreach (var item in Match_items)
-            {
-                dropList.Add(item.Solution);
-            }
-            dropList = ShuffleList(dropList);
-          
-            return (Match_items, dropList);
-        }
         public async Task<IActionResult> SubmitWordMatch()
         {
             //this is what we do with the WordMatch data
