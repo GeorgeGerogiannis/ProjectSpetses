@@ -42,11 +42,11 @@ namespace ProjectSpetses.Controllers
         public async Task<IActionResult> WordMatch()
         {
             //This is where you do DB stuff
-            var Match_items = await _dbContext.Quiz_items.ToListAsync();
+            var Match_items = await _dbContext.Match_items.ToListAsync();
 
             //Testing data
             //here i select 4 quizes from the DB since we dont have a selection method yet
-            Match_items = new List<Quiz_item> { Match_items[0], Match_items[1], Match_items[2], Match_items[3] };
+            Match_items = new List<Match_item> { Match_items[0], Match_items[1], Match_items[2], Match_items[3] };
 
             //get the drop list for the html
             List<String> dropList = new List<String>();
@@ -58,21 +58,7 @@ namespace ProjectSpetses.Controllers
 
             return View((Match_items, dropList));
         }
-        public (List<Match_item>, List<string>) GetWordMatches() 
-        {
-            //This is where you do DB stuff
-            //add "/images/" by code, take the name and extension from DB
 
-            //this makes a shuffled list of the solutions to be used in the drop down
-            List<String> dropList = new List<String>();
-            foreach (var item in Match_items)
-            {
-                dropList.Add(item.Solution);
-            }
-            dropList = ShuffleList(dropList);
-          
-            return (Match_items, dropList);
-        }
         public async Task<IActionResult> SubmitWordMatch()
         {
             //this is what we do with the WordMatch data
