@@ -6,7 +6,7 @@ namespace ProjectSpetses.Models.Entities
     {
         [Key]
         public required Guid Id { get; set; }
-        [MinLength(3, ErrorMessage = "Username must be at least 3 characters"), MaxLength(30, ErrorMessage = "Username must be at most 30 characters")]
+        [MinLength(2), MaxLength(30)]
         public required string Username { get; set; }
         public required string Password { get; set; }
         public required string Salt { get; set; }

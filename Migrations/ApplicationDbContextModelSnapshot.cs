@@ -53,7 +53,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.ToTable("Blank_items");
+                    b.ToTable("Blank_items", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Category", b =>
@@ -78,7 +78,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
@@ -100,7 +100,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Content");
+                    b.ToTable("Content", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Match_item", b =>
@@ -126,7 +126,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.ToTable("Match_items");
+                    b.ToTable("Match_items", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Quiz_item", b =>
@@ -156,7 +156,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.ToTable("Quiz_items");
+                    b.ToTable("Quiz_items", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Section", b =>
@@ -176,7 +176,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sections");
+                    b.ToTable("Sections", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Stats", b =>
@@ -189,7 +189,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stats");
+                    b.ToTable("Stats", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.User", b =>
@@ -213,7 +213,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Blank_item", b =>

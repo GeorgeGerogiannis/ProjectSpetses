@@ -8,6 +8,7 @@ namespace ProjectSpetses.Models.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public required ushort Id { get; set; }
+        [DataType(DataType.Text)]
         public required string Text { get; set; }
         public required ushort CategoryId { get; set; }
         public required ushort Page { get; set; }
