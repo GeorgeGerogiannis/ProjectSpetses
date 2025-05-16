@@ -37,7 +37,7 @@ namespace ProjectSpetses.Controllers
         {
             //this is what we do with the quiz data
             //the quiz page doesn't save the data in any form yet (use asp-for= and a model)
-            return null;
+            return View("Games");
         }
         public async Task<IActionResult> WordMatch()
         {
@@ -63,7 +63,7 @@ namespace ProjectSpetses.Controllers
         {
             //this is what we do with the WordMatch data
             //the WordMatch page doesn't save the data in any form yet (use asp-for= and a model)
-            return null;
+            return View("Games");
         }
         public async Task<IActionResult> FillBlank()
         {
