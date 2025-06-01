@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectSpetses.Data;
 
@@ -11,9 +12,11 @@ using ProjectSpetses.Data;
 namespace ProjectSpetses.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250516114841_DataAnnotations")]
+    partial class DataAnnotations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,10 +56,10 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.ToTable("Blank_items", (string)null);
+                    b.ToTable("Blank_items");
                 });
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Category", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.CategoryNew", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -78,10 +81,10 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("SectionId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("CategoriesNew");
                 });
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.ContentNew", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -100,7 +103,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Content", (string)null);
+                    b.ToTable("ContentNew");
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Match_item", b =>
@@ -126,7 +129,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.ToTable("Match_items", (string)null);
+                    b.ToTable("Match_items");
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Quiz_item", b =>
@@ -156,10 +159,10 @@ namespace ProjectSpetses.Migrations
 
                     b.HasIndex("ContentId");
 
-                    b.ToTable("Quiz_items", (string)null);
+                    b.ToTable("Quiz_items");
                 });
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Section", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.SectionNew", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -176,7 +179,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sections", (string)null);
+                    b.ToTable("SectionsNew");
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Stats", b =>
@@ -189,7 +192,7 @@ namespace ProjectSpetses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stats", (string)null);
+                    b.ToTable("Stats");
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.User", b =>
@@ -213,12 +216,12 @@ namespace ProjectSpetses.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Blank_item", b =>
                 {
-                    b.HasOne("ProjectSpetses.Models.Entities.Content", "Content")
+                    b.HasOne("ProjectSpetses.Models.Entities.ContentNew", "Content")
                         .WithMany()
                         .HasForeignKey("ContentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -227,9 +230,9 @@ namespace ProjectSpetses.Migrations
                     b.Navigation("Content");
                 });
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Category", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.CategoryNew", b =>
                 {
-                    b.HasOne("ProjectSpetses.Models.Entities.Section", "Section")
+                    b.HasOne("ProjectSpetses.Models.Entities.SectionNew", "Section")
                         .WithMany()
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -238,9 +241,9 @@ namespace ProjectSpetses.Migrations
                     b.Navigation("Section");
                 });
 
-            modelBuilder.Entity("ProjectSpetses.Models.Entities.Content", b =>
+            modelBuilder.Entity("ProjectSpetses.Models.Entities.ContentNew", b =>
                 {
-                    b.HasOne("ProjectSpetses.Models.Entities.Category", "Category")
+                    b.HasOne("ProjectSpetses.Models.Entities.CategoryNew", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -251,7 +254,7 @@ namespace ProjectSpetses.Migrations
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Match_item", b =>
                 {
-                    b.HasOne("ProjectSpetses.Models.Entities.Content", "Content")
+                    b.HasOne("ProjectSpetses.Models.Entities.ContentNew", "Content")
                         .WithMany()
                         .HasForeignKey("ContentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -262,7 +265,7 @@ namespace ProjectSpetses.Migrations
 
             modelBuilder.Entity("ProjectSpetses.Models.Entities.Quiz_item", b =>
                 {
-                    b.HasOne("ProjectSpetses.Models.Entities.Content", "Content")
+                    b.HasOne("ProjectSpetses.Models.Entities.ContentNew", "Content")
                         .WithMany()
                         .HasForeignKey("ContentId")
                         .OnDelete(DeleteBehavior.Cascade)
