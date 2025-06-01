@@ -61,17 +61,17 @@ namespace ProjectSpetses.Data
                 .WithMany()
                 .HasForeignKey(c => c.CategoryId);
 
-            modelBuilder.Entity<Quiz_item>().HasOne(c => c.Content)
+            modelBuilder.Entity<Quiz_item>().HasOne(c => c.Section)
                 .WithMany()
-                .HasForeignKey(c => c.ContentId);
+                .HasForeignKey(c => c.SectionId);
 
-            modelBuilder.Entity<Blank_item>().HasOne(c => c.Content)
+            modelBuilder.Entity<Blank_item>().HasOne(c => c.Section)
                 .WithMany()
-                .HasForeignKey(c => c.ContentId);
+                .HasForeignKey(c => c.SectionId);
 
-            modelBuilder.Entity<Match_item>().HasOne(c => c.Content)
+            modelBuilder.Entity<Match_item>().HasOne(c => c.Section)
                 .WithMany()
-                .HasForeignKey(c => c.ContentId);
+                .HasForeignKey(c => c.SectionId);
 
             //these work, trust me bro
             modelBuilder.Entity<Quiz_item>()

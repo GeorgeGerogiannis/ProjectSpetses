@@ -13,5 +13,6 @@ namespace ProjectSpetses.Models.Entities
 
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
+        public int PointsRequired { get; set; }
     }
 }

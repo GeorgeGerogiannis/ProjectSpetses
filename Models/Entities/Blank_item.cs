@@ -7,8 +7,8 @@
         public required string Description2 { get; set; }
         public required string Solution { get; set; }
         public required List<string> Answers { get; set; }
-        public required ushort ContentId { get; set; }
+        public required ushort SectionId { get; set; }
 
-        public Content Content { get; set; }
+        public Section Section { get; set; }
     }
 }

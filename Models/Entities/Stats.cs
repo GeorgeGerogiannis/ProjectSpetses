@@ -7,6 +7,7 @@ namespace ProjectSpetses.Models.Entities
         [Key]
         public required Guid Id { get; set; }
         public string? LastRead { get; set; }
+        public int TotalPoints { get; set; }
 
         public User User { get; set; }
     }
