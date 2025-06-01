@@ -19,10 +19,19 @@ namespace ProjectSpetses.Controllers
                 return NotFound("Something Went Wrong");
             }
 
-            //get sections from database
+            var stats = await _dbContext.Stats
+                .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+
             var sections = await _dbContext.Sections.ToListAsync();
 
-            return View(sections);
+            //get sections from database
+            var model = new ExploreViewModel
+            {
+                Sections = sections,
+                Points = stats.TotalPoints
+            };
+
+            return View(model);
         }
         
         [HttpGet]
