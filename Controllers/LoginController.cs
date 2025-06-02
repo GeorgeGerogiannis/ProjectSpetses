@@ -107,7 +107,8 @@ namespace ProjectSpetses.Controllers
             {
                 Id = userId,
                 TotalPoints = 0,
-                CategoriesRead = []
+                CategoriesRead = [],
+                NotificationsGiven = []
             };
 
             //add the user and the stats to the database

@@ -9,6 +9,7 @@ namespace ProjectSpetses.Models.Entities
         public string? LastRead { get; set; }
         public required uint TotalPoints { get; set; }
         public required List<string> CategoriesRead { get; set; }
+        public required List<int> NotificationsGiven { get; set; }
 
         public User User { get; set; }
     }

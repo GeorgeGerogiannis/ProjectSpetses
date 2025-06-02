@@ -16,7 +16,7 @@
 else
 {
     <p>Page: @(Model.Content.Page)/@Model.PageCount</p>
-    <p class="content-text">@Model.Content.Text</p>
+    <p class="content-text">@Html.Raw(Model.Content.Text)</p>
 
     <div class="button-row">
         @if (Model.Content.Page > 1)

@@ -128,12 +128,24 @@ namespace ProjectSpetses.Controllers
 
             }
 
+            var notify = false;
+
+            if (!completed.Contains(false) && !stats.NotificationsGiven.Contains(Id))
+            {
+                //if the user has completed all categories in this section and has not been notified yet, give them a notification
+                var notifications = _dbContext.Update(stats).Entity.NotificationsGiven;
+                notifications.Add(Id);
+                await _dbContext.SaveChangesAsync();
+                notify = true;
+            }
+
             var model = new SectionViewModel
             {
                 SectionId = Id,
                 SectionName = section.Name,
                 Categories = categories,
-                Completed = completed
+                Completed = completed,
+                Notify = notify
             };
 
             return View(model);

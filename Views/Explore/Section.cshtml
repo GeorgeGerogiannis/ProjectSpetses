@@ -9,7 +9,7 @@
 @if (Model.Categories.Count == 0)
 {
     <div class="text-center">
-        <h2 class="display-4">Αυτή η ενότητα δεν περιέχει κατηγορίες</h2>
+        <h3 class="display-4">Αυτή η ενότητα δεν περιέχει κατηγορίες</h3>
     </div>
 }
 else
@@ -36,7 +36,41 @@ else
                     </div>
                 </div>
             </a>
-            
         }
     </div>
+
+    if (Model.Notify == true)
+    {
+        <!-- pop-up modal -->
+        <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notificationModalLabel">Ειδοποίηση</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Συγχαρητήρια! Έχετε ολοκληρώσει αυτή την ενότητα.</p>
+                        <p>Μπορείτε να τεστάρετε τις γνώσεις σας παίζοντας τα παιχνίδια που σας προσφέρουμε ή να ξαναδιαβάσετε το περιεχόμενο της ενότητας.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Κλείσιμο</button>
+                        <a class="btn btn-primary"
+                           asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
+                           asp-action="@nameof(GamesController.Index)">
+                            Παιχνίδια!
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- load modal on page load -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+                notificationModal.show();
+            });
+        </script>
+    }
 }

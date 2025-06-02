@@ -60,7 +60,14 @@
                                 <a class="nav-link text-black"
                                    asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(GamesController.Index)">
-                                    Games
+                                    Παιχνίδια
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-black"
+                                   asp-controller="@nameof(StatsController)[..nameof(StatsController).LastIndexOf("Controller")]"
+                                   asp-action="@nameof(StatsController.Index)">
+                                    Στατιστικά
                                 </a>
                             </li>
                             <li class="nav-item">
