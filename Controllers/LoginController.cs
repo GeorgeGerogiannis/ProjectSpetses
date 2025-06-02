@@ -106,7 +106,8 @@ namespace ProjectSpetses.Controllers
             var stats = new Stats
             {
                 Id = userId,
-                TotalPoints = 0
+                TotalPoints = 0,
+                CategoriesRead = []
             };
 
             //add the user and the stats to the database

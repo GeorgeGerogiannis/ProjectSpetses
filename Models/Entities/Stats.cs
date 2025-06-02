@@ -8,7 +8,7 @@ namespace ProjectSpetses.Models.Entities
         public required Guid Id { get; set; }
         public string? LastRead { get; set; }
         public required uint TotalPoints { get; set; }
-        public List<int>? SectionsRead { get; set; }
+        public required List<string> CategoriesRead { get; set; }
 
         public User User { get; set; }
     }

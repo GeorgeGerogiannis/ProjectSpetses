@@ -19,23 +19,50 @@ namespace ProjectSpetses.Controllers
                 return NotFound("Something Went Wrong");
             }
 
-            var stats = await _dbContext.Stats
-                .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+            //get the current user points
+            var points = await _dbContext.Stats
+                .Where(s => s.Id == GetCurrentUserId())
+                .Select(s => s.TotalPoints)
+                .FirstOrDefaultAsync();
 
+            //get all sections from the database
             var sections = await _dbContext.Sections.ToListAsync();
 
-            //get sections from database
+            var completedSections = new List<bool>();
+
+            foreach (var section in sections)
+            {
+                //get the number of categories in each section
+                var categoryCount = await _dbContext.Categories
+                    .Where(c => c.SectionId == section.Id)
+                    .CountAsync();
+
+                //get the number of completed categories for the current user
+                var categoriesRead = _dbContext.Update(_dbContext.Stats.FirstOrDefault(s => s.Id == GetCurrentUserId())).Entity.CategoriesRead.Count;
+
+                //check if the user has completed all categories in this section
+                if (categoriesRead == categoryCount)
+                {
+                    completedSections.Add(true);
+                }
+                else
+                {
+                    completedSections.Add(false);
+                }
+            }
+
             var model = new ExploreViewModel
             {
                 Sections = sections,
-                Points = stats.TotalPoints
+                Completed = completedSections,
+                Points = points
             };
 
             return View(model);
         }
         
         [HttpGet]
-        public async Task<IActionResult> Section(ushort Id)
+        public async Task<IActionResult> Section(ushort Id, ushort cId = 0)
         {
             //check if user is authenticated
             if (!User.Identity.IsAuthenticated)
@@ -43,20 +70,70 @@ namespace ProjectSpetses.Controllers
                 return NotFound("Something Went Wrong");
             }
 
-            //get section name
+            //get the section
             var section = await _dbContext.Sections
                 .FirstOrDefaultAsync(s => s.Id == Id);
 
-            //get categories from database
+            if (section == null)
+            {
+                return NotFound("Section not found");
+            }
+
+            //get the current user stats
+            var stats = await _dbContext.Stats
+                .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+
+            if (section.PointsRequired > stats.TotalPoints)
+            {
+                //if the user does not have enough points, redirect to the index page
+                return RedirectToAction(nameof(Index));
+            }
+
+            //get the completed categories
+            var categoriesRead = _dbContext.Update(stats).Entity.CategoriesRead;
+
+            if (cId != 0)
+            {
+                //if the user just completed a category, add it to the completed categories
+                var entry = $"{Id}:{cId}";
+                
+                if (!categoriesRead.Contains(entry))
+                {
+                    
+                    categoriesRead.Add(entry);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+
+            //get the section's categories
             var categories = await _dbContext.Categories
                 .Where(c => c.SectionId == Id)
                 .ToListAsync();
+
+            var completed = new List<bool>();
+
+            foreach (var category in categories)
+            {
+                var entry = $"{Id}:{category.SectionIndex}";
+
+                //check if the user has completed this category
+                if (categoriesRead.Contains(entry))
+                {
+                    completed.Add(true);
+                }
+                else
+                {
+                    completed.Add(false);
+                }
+
+            }
 
             var model = new SectionViewModel
             {
                 SectionId = Id,
                 SectionName = section.Name,
-                Categories = categories
+                Categories = categories,
+                Completed = completed
             };
 
             return View(model);
@@ -74,11 +151,16 @@ namespace ProjectSpetses.Controllers
 
             //get category name
             var category = await _dbContext.Categories
-                .FirstOrDefaultAsync(c => c.Id == Id);
+                .FirstOrDefaultAsync(c => c.SectionIndex == Id && c.SectionId == sectionId);
+
+            if (category == null)
+            {
+                return NotFound("Category not found");
+            }
 
             //get content from database
             var content = await _dbContext.Content
-                .FirstOrDefaultAsync(c => c.CategoryId == Id && c.Page == page);
+                .FirstOrDefaultAsync(c => c.CategoryId == category.Id && c.Page == page);
 
             //get the category page count
             var pageCount = (ushort) await _dbContext.Content

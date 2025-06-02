@@ -16,9 +16,10 @@ else
     <div>
         <h2>Επιλέξτε Ενότητα</h2>
         @* NOTE: section is a keyword (like @model), so avoid using it after '@'*@
-        @foreach (var exploreSection in Model.Sections)
+        @for (int i = 0; i < Model.Sections.Count; i++)
         {
-            @if(exploreSection.PointsRequired > Model.Points)
+            var exploreSection = Model.Sections[i];
+            if (exploreSection.PointsRequired > Model.Points)
             {
                 <a class="section-card-link locked">
                     <div class="section-card locked">
@@ -33,13 +34,14 @@ else
                         </div>
                     </div>
                 </a>
-            } else
+            }
+            else
             {
                 <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                    asp-action="@nameof(ExploreController.Section)"
                    asp-route-Id="@exploreSection.Id"
-                   class="section-card-link">
-                    <div class="section-card">
+                   class="section-card-link @(Model.Completed[i] ? "completed" : "")">
+                    <div class="section-card @(Model.Completed[i] ? "completed" : "")">
                         <div class="section-thumbnail">
                             <img src="@exploreSection.ImageUrl" class="img-fluid rounded-start" alt="@exploreSection.Name">
                         </div>
@@ -52,7 +54,6 @@ else
                     </div>
                 </a>
             }
-            
         }
     </div>
 }

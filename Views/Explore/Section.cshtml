@@ -15,15 +15,16 @@
 else
 {
     <div class="category-grid">
-        @foreach (var category in Model.Categories)
+        @for (int i = 0; i < Model.Categories.Count; i++)
         {
+            var category = Model.Categories[i];
             <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
-               asp-route-Id="@category.Id"
+               asp-route-Id="@category.SectionIndex"
                asp-route-page="1"
-               class="category-card-link">
-                <div class="category-card">
+               class="category-card-link @(Model.Completed[i] ? "completed" : "")">
+                <div class="category-card @(Model.Completed[i] ? "completed" : "")">
                     <div class="category-thumbnail">
                         <img src="@category.ImageUrl" alt="@category.Name" />
                     </div>
@@ -35,6 +36,7 @@ else
                     </div>
                 </div>
             </a>
+            
         }
     </div>
 }

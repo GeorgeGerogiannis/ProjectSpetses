@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectSpetses.Data;
 
@@ -11,9 +12,11 @@ using ProjectSpetses.Data;
 namespace ProjectSpetses.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250602130729_StatsCategoriesRead")]
+    partial class StatsCategoriesRead
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,9 +75,6 @@ namespace ProjectSpetses.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SectionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SectionIndex")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

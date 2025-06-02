@@ -41,8 +41,8 @@ namespace ProjectSpetses.Controllers
 
                     //get the category name
                     var category = await _dbContext.Categories
-                        .Select(c => new { c.Id, c.Name })
-                        .FirstOrDefaultAsync(c => c.Id == categoryId);
+                        .Select(c => new { c.SectionIndex, c.Name })
+                        .FirstOrDefaultAsync(c => c.SectionIndex == categoryId);
 
                     if (section != null && category != null)
                     {
@@ -51,7 +51,7 @@ namespace ProjectSpetses.Controllers
                         {
                             SectionId = section.Id,
                             SectionName = section.Name,
-                            CategoryId = category.Id,
+                            CategoryId = category.SectionIndex,
                             CategoryName = category.Name,
                             Page = page
                         };

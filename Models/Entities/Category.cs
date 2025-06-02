@@ -14,6 +14,7 @@ namespace ProjectSpetses.Models.Entities
         [DataType(DataType.ImageUrl)]
         public string? ImageUrl { get; set; }
         public required ushort SectionId { get; set; }
+        public required ushort SectionIndex { get; set; }
 
         public Section Section { get; set; }
     }

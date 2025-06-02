@@ -101,3 +101,45 @@
     filter: grayscale(100%);
     opacity: 0.5;
 }
+
+.section-card-link.completed {
+    display: block;
+    text-decoration: none;
+    color: black;
+    transition: transform 0.2s ease;
+}
+
+.section-card-link.completed:hover {
+    transform: translateY(-5px);
+    color: black;
+}
+
+.section-card.completed {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin: 10px 0;
+    background-color: #d4edda;
+    border-radius: 5px;
+    overflow: hidden;
+    border: 2px solid #28a745;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.section-card.completed::before {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: #28a745;
+    z-index: 10;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+}
