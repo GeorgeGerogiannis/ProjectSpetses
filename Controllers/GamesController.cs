@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
 using ProjectSpetses.Models.Entities;
@@ -9,6 +10,144 @@ namespace ProjectSpetses.Controllers
     {
         //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
+
+        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
+            List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
+        {
+            //Load all items from the database
+            List<Quiz_item> quiz_items = await _dbContext.Quiz_items.ToListAsync();
+            List<Blank_item> blank_items = await _dbContext.Blank_items.ToListAsync();
+            List<Match_item> match_items = await _dbContext.Match_items.ToListAsync();
+
+            //ensure a minimum duration of 3 games
+            if (duration < 3) duration = 3;
+
+            //find the games dedicated to the Required IDs 
+            //duration / 3 (rounded up)
+            int requiredDuration = duration / 3;
+            if (duration % 3 != 0) requiredDuration++;
+
+            //selected games
+            var selectedGames = new List<object>();
+
+            //select the required items from the IDs
+            List<object> allRequired = new List<object>();
+            if (requiredQuiz != null)
+            {
+                foreach (var id in requiredQuiz)
+                {
+                    Quiz_item item = quiz_items.FirstOrDefault(q => q.Id == id);
+                    if (item != null)
+                    {
+                        allRequired.Add(item);
+                    }
+                }
+            }
+            if (requiredBlank != null)
+            {
+                foreach (var id in requiredBlank)
+                {
+                    Blank_item item = blank_items.FirstOrDefault(b => b.Id == id);
+                    if (item != null)
+                    {
+                        allRequired.Add(item);
+                    }
+                }
+            }
+            if (requiredMatch != null)
+            {
+                foreach (var id in requiredMatch)
+                {
+                    Match_item item = match_items.FirstOrDefault(m => m.Id == id);
+                    if (item != null)
+                    {
+                        allRequired.Add(item);
+                    }
+                }
+            }
+
+            //add some/all the required items to the final list
+            //it's important that all lists are intitialized to avoid Exv=ceptions from .Count
+            if (allRequired.Count > 0)
+            {
+                //if there are more required items than the required duration, select a random subset
+                for (int i = 0; i < requiredDuration; i++)
+                {
+                    int randomIndex = new Random().Next(allRequired.Count);
+                    //add a random game, remove it from the main list(to avoid replays)
+                    //and empty the required list
+                    if (allRequired[randomIndex] is Quiz_item quizItem)
+                    {
+                        selectedGames.Add(quizItem);
+                        quiz_items.RemoveAll(q => q.Id == quizItem.Id);
+                        allRequired.RemoveAt(randomIndex);
+                    }
+                    else if (allRequired[randomIndex] is Blank_item blankItem)
+                    {
+                        selectedGames.Add(blankItem);
+                        blank_items.RemoveAll(b => b.Id == blankItem.Id);
+                        allRequired.RemoveAt(randomIndex);
+                    }
+                    else if (allRequired[randomIndex] is Match_item matchItem)
+                    {
+                        selectedGames.Add(matchItem);
+                        match_items.RemoveAll(m => m.Id == matchItem.Id);
+                        allRequired.RemoveAt(randomIndex);
+                    }
+                    //break if all required items are selected
+                    if (allRequired.Count == 0) 
+                        break; 
+                }
+            }
+            //adjust the duration in case any required games where added
+            duration -= selectedGames.Count; 
+
+            //remove items that are not in the selected sections
+            quiz_items = quiz_items.Where(q => sections.Contains(q.SectionId)).ToList();
+            blank_items = blank_items.Where(b => sections.Contains(b.SectionId)).ToList();
+            match_items = match_items.Where(m => sections.Contains(m.SectionId)).ToList();
+
+            //Q for Quiz, B for Blank, M for Match
+            List<char> gameNames = ['Q', 'B', 'M'];
+            
+            //select random games
+            for (int i = 0; i < duration; i++)
+            {
+                //removes game types that have no items left
+                if (quiz_items.Count == 0)
+                    gameNames.Remove('Q');
+                if (blank_items.Count == 0)
+                    gameNames.Remove('B');
+                if (match_items.Count == 0)
+                    gameNames.Remove('M');
+                //if no game types are left, break the loop
+                if (gameNames.Count == 0) 
+                    break; 
+
+                //select a random game type
+                int gameType = new Random().Next(gameNames.Count);
+                //fill the rest of the selected Games
+                if (gameType == 0)
+                {
+                    int randomIndex = new Random().Next(quiz_items.Count);
+                    selectedGames.Add(quiz_items[randomIndex]);
+                    quiz_items.RemoveAt(randomIndex);
+                }
+                else if (gameType == 1)
+                {
+                    int randomIndex = new Random().Next(blank_items.Count);
+                    selectedGames.Add(blank_items[randomIndex]);
+                    blank_items.RemoveAt(randomIndex);
+                }
+                else if (gameType == 2)
+                {
+                    int randomIndex = new Random().Next(match_items.Count);
+                    selectedGames.Add(match_items[randomIndex]);
+                    match_items.RemoveAt(randomIndex);
+                }
+            }
+        }
+
 
         public IActionResult Index()
         {
