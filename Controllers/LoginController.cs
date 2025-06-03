@@ -38,7 +38,7 @@ namespace ProjectSpetses.Controllers
             if (!VerifyUser(user, viewModel.Password))
             {
                 //if login fails, add error and return to view
-                ModelState.AddModelError("LoginCredentials", "Invalid username or password");
+                ModelState.AddModelError("LoginCredentials", "Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης");
                 return View(viewModel);
             }
 
@@ -82,7 +82,7 @@ namespace ProjectSpetses.Controllers
             if (user != null)
             {
                 //if username already exists, add error and return to view
-                ModelState.AddModelError("RegisterCredentials", "A User with name " + viewModel.Username + " already exists");
+                ModelState.AddModelError("RegisterCredentials", "Υπάρχει ήδη χρήστης με το όνομα " + viewModel.Username + "!");
                 return View(viewModel);
             }
 
@@ -108,7 +108,8 @@ namespace ProjectSpetses.Controllers
                 Id = userId,
                 TotalPoints = 0,
                 CategoriesRead = [],
-                NotificationsGiven = []
+                NotificationsGiven = [],
+                CreatedAt = DateTime.UtcNow
             };
 
             //add the user and the stats to the database
@@ -123,6 +124,7 @@ namespace ProjectSpetses.Controllers
             return RedirectToAction(nameof(HomeController.Index), nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
         }
 
+        //checks if the user exists and verifies the password
         private static bool VerifyUser(User user, string password)
         {
             if (user == null)
@@ -136,6 +138,7 @@ namespace ProjectSpetses.Controllers
             return hashedPassword == user.Password;
         }
 
+        //creates a cookie for the user after successful login or registration
         private async Task CreateCookieAsync(Guid userId, string userName)
         {
             var claims = new List<Claim>

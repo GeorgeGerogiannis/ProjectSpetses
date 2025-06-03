@@ -6,9 +6,9 @@ using ProjectSpetses.Models;
 
 namespace ProjectSpetses.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, ApplicationDbContext dbContext) : Controller
+    public class HomeController(ApplicationDbContext dbContext) : Controller
     {
-        private readonly ILogger<HomeController> _logger = logger;
+        //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
 
         public async Task<IActionResult> Index()
@@ -19,7 +19,7 @@ namespace ProjectSpetses.Controllers
                 return View();
             }
 
-            //get the user's last read stat
+            //get the user's last read content
             var lastRead = await _dbContext.Stats
                 .Where(s => s.Id == GetCurrentUserId())
                 .Select(s => s.LastRead)
@@ -27,7 +27,7 @@ namespace ProjectSpetses.Controllers
 
             if (lastRead != null)
             {
-                //parse the "{sectionId}:{categoryId}:{page}" format string
+                //parse the "{sectionId}:{categoryId}:{contentPage}" format string
                 var parts = lastRead.Split(':');
                 if (parts.Length == 3 &&
                     ushort.TryParse(parts[0], out ushort sectionId) &&
@@ -46,7 +46,7 @@ namespace ProjectSpetses.Controllers
 
                     if (section != null && category != null)
                     {
-                        //create the model and set it's properties
+                        //create the model
                         var model = new HomeViewModel
                         {
                             SectionId = section.Id,
@@ -58,8 +58,6 @@ namespace ProjectSpetses.Controllers
 
                         return View(model);
                     }
-
-                    
                 }
             }
 
@@ -77,6 +75,7 @@ namespace ProjectSpetses.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        //gets the user's id from session
         private Guid GetCurrentUserId()
         {
             var currentUserId = User.FindFirst("User_id")?.Value;

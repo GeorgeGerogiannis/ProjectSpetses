@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
+using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
 
 namespace ProjectSpetses.Controllers
@@ -10,9 +11,38 @@ namespace ProjectSpetses.Controllers
         //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            //check if user is authenticated
+            if (!User.Identity.IsAuthenticated)
+            {
+                return NotFound("Something Went Wrong");
+            }
+
+            //get the numer of sections in the database
+            var sectionCount = await _dbContext.Sections.CountAsync();
+
+            //get the section names
+            var sectionNames = await _dbContext.Sections
+                .Select(s => s.Name)
+                .ToListAsync();
+
+            //get the user's completed sections (can be represented by the NotificationsGiven column)
+            var completedSections = await _dbContext.Stats
+                .Where(s => s.Id == GetCurrentUserId())
+                .Select(s => s.NotificationsGiven)
+                .FirstOrDefaultAsync();
+
+            //create the model
+            var model = new GamesViewModel
+            {
+                SectionCount = (ushort)sectionCount,
+                CompletedSectionIds = completedSections,
+                SectionNames = sectionNames
+            };
+
+            return View(model);
         }
         public async Task<IActionResult> Quiz()
         {
@@ -88,6 +118,13 @@ namespace ProjectSpetses.Controllers
         {//this shuffles String lists to avoid obvious tests
             Random random = new Random();
             return list.OrderBy(_ => random.Next()).ToList();
+        }
+
+        //gets the user's id from session
+        private Guid GetCurrentUserId()
+        {
+            var currentUserId = User.FindFirst("User_id")?.Value;
+            return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
         }
     }
 }

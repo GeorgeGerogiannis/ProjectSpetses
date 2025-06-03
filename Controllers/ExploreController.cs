@@ -25,11 +25,12 @@ namespace ProjectSpetses.Controllers
                 .Select(s => s.TotalPoints)
                 .FirstOrDefaultAsync();
 
-            //get all sections from the database
+            //get all section data
             var sections = await _dbContext.Sections.ToListAsync();
 
-            var completedSections = new List<bool>();
-
+            var sectionCategories = new List<ushort>();
+            var completedSections = new List<ushort>();
+            
             foreach (var section in sections)
             {
                 //get the number of categories in each section
@@ -40,21 +41,17 @@ namespace ProjectSpetses.Controllers
                 //get the number of completed categories for the current user
                 var categoriesRead = _dbContext.Update(_dbContext.Stats.FirstOrDefault(s => s.Id == GetCurrentUserId())).Entity.CategoriesRead.Count;
 
-                //check if the user has completed all categories in this section
-                if (categoriesRead == categoryCount)
-                {
-                    completedSections.Add(true);
-                }
-                else
-                {
-                    completedSections.Add(false);
-                }
+                //add both in lists to use them for showing user progression
+                sectionCategories.Add((ushort)categoryCount);
+                completedSections.Add((ushort)categoriesRead);
             }
 
+            //create the model
             var model = new ExploreViewModel
             {
                 Sections = sections,
-                Completed = completedSections,
+                CategoryCount = sectionCategories,
+                CompletedCategories = completedSections,
                 Points = points
             };
 
@@ -70,10 +67,11 @@ namespace ProjectSpetses.Controllers
                 return NotFound("Something Went Wrong");
             }
 
-            //get the section
+            //get the section data
             var section = await _dbContext.Sections
                 .FirstOrDefaultAsync(s => s.Id == Id);
 
+            //check if the section exists
             if (section == null)
             {
                 return NotFound("Section not found");
@@ -99,13 +97,12 @@ namespace ProjectSpetses.Controllers
                 
                 if (!categoriesRead.Contains(entry))
                 {
-                    
                     categoriesRead.Add(entry);
                     await _dbContext.SaveChangesAsync();
                 }
             }
 
-            //get the section's categories
+            //get all the section's categories
             var categories = await _dbContext.Categories
                 .Where(c => c.SectionId == Id)
                 .ToListAsync();
@@ -116,7 +113,7 @@ namespace ProjectSpetses.Controllers
             {
                 var entry = $"{Id}:{category.SectionIndex}";
 
-                //check if the user has completed this category
+                //if the user has completed this category add 'true' to the list to show user progression
                 if (categoriesRead.Contains(entry))
                 {
                     completed.Add(true);
@@ -125,7 +122,6 @@ namespace ProjectSpetses.Controllers
                 {
                     completed.Add(false);
                 }
-
             }
 
             var notify = false;
@@ -133,12 +129,14 @@ namespace ProjectSpetses.Controllers
             if (!completed.Contains(false) && !stats.NotificationsGiven.Contains(Id))
             {
                 //if the user has completed all categories in this section and has not been notified yet, give them a notification
+                //and consider the section completed and the user ready to play the section's games
                 var notifications = _dbContext.Update(stats).Entity.NotificationsGiven;
                 notifications.Add(Id);
                 await _dbContext.SaveChangesAsync();
                 notify = true;
             }
 
+            //create the model
             var model = new SectionViewModel
             {
                 SectionId = Id,
@@ -165,6 +163,7 @@ namespace ProjectSpetses.Controllers
             var category = await _dbContext.Categories
                 .FirstOrDefaultAsync(c => c.SectionIndex == Id && c.SectionId == sectionId);
 
+            //check if the category exists
             if (category == null)
             {
                 return NotFound("Category not found");
@@ -184,11 +183,10 @@ namespace ProjectSpetses.Controllers
                 .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
 
             //add the last read content to the user stats
-            //format: {sectionId}:{Id}:{page}
             stats.LastRead = $"{sectionId}:{Id}:{page}";
             await _dbContext.SaveChangesAsync();
 
-
+            //create the model
             var model = new CategoryViewModel
             {
                 SectionId = sectionId,
@@ -201,6 +199,7 @@ namespace ProjectSpetses.Controllers
             return View(model);
         }
 
+        //gets the user's id from session
         private Guid GetCurrentUserId()
         {
             var currentUserId = User.FindFirst("User_id")?.Value;

@@ -3,7 +3,9 @@
     public class StatsViewModel
     {
         public string Username { get; set; }
-        public uint TotalPoints { get; set; }
-        public uint CategoriesRead { get; set; }
+        public required uint TotalPoints { get; set; }
+        public required ushort SectionsCompleted { get; set; }
+        public required ushort CategoriesCompleted { get; set; }
+        public required DateTime CreatedAt { get; set; }
     }
 }

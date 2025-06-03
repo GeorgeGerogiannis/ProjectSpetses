@@ -4,12 +4,12 @@ namespace ProjectSpetses.Models
 {
     public class LoginViewModel
     {
-        [Required]
-        [MinLength(2, ErrorMessage = "Username must be at least 2 characters"), MaxLength(30, ErrorMessage = "Username must be at most 30 characters")]
-        public string Username { get; set; }
+        [Required(ErrorMessage = "Παρακαλώ συμπληρώστε το όνομα χρήστη")]
+        [MinLength(2, ErrorMessage = "Το όνομα χρήστη πρέπει να περιέχει τουλάχιστον 2 χαρακτήρες!"), MaxLength(30, ErrorMessage = "Το όνομα χρήστη πρέπει να περιέχει το πολύ 30 χαρακτήρες!")]
+        public required string Username { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Παρακαλώ συμπληρώστε τον κωδικό πρόσβασης")]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public required string Password { get; set; }
     }
 }

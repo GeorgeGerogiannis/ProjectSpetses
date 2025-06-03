@@ -1,14 +1,79 @@
-﻿@{
-    ViewData["Title"] = "Games";
+﻿@model GamesViewModel
+@{
+    ViewData["Title"] = "Παιχνίδια";
 }
-<footer class="border-top footer text-muted">
-    <div class="container">
-        Testing - <a asp-area="" asp-controller="Games" asp-action="Quiz">Quiz</a>
-    </div>
-    <div>
-        Testing - <a asp-area="" asp-controller="Games" asp-action="WordMatch">WordMatch</a>
-    </div>
-    <div>
-        Testing - <a asp-area="" asp-controller="Games" asp-action="FillBlank">Fill Blanks</a>
-    </div>
-</footer>
+
+<link rel="stylesheet" href="~/css/games.css" />
+
+<h2>Παιχνίδια</h2>
+
+<div class="game-grid">
+    @for (ushort i = 1; i <= Model.SectionCount; i++)
+    {
+        if (Model.CompletedSectionIds.Contains(i))
+        {
+            <a asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
+               asp-action="StartGame"
+               asp-route-sectionId="@i"
+               asp-route-difficulty="easy"
+               class="game-card-link">
+                <div class="game-card easy">
+                    <div class="game-info">
+                        <h3 class="game-title">
+                            @Model.SectionNames[i - 1]
+                        </h3>
+                        <p class="game-description">Εύκολο</p>
+                    </div>
+                </div>
+            </a>
+
+            <a asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
+               asp-action="StartGame"
+               asp-route-sectionId="@i"
+               asp-route-difficulty="hard"
+               class="game-card-link">
+                <div class="game-card hard">
+                    <div class="game-info">
+                        <h3 class="game-title">
+                            @Model.SectionNames[i - 1]
+                        </h3>
+                        <p class="game-description">Δύσκολο</p>
+                    </div>
+                </div>
+            </a>
+        }
+        else
+        {
+            <a class="game-card-link locked">
+                <div class="game-card easy locked">
+                    <div class="game-info">
+                        <h3 class="game-title">
+                            @Model.SectionNames[i - 1]
+                        </h3>
+                        <p class="game-description">Εύκολο</p>
+                    </div>
+                    <div class="lock-overlay">
+                            <span class="lock-icon">🔒</span>
+                            <div class="points-required">Διαβάστε την ενότητα @i</div>
+                    </div>
+                </div>
+            </a>
+
+            <a class="game-card-link locked">
+                <div class="game-card hard locked">
+                    <div class="game-info">
+                        <h3 class="game-title">
+                            @Model.SectionNames[i - 1]
+                        </h3>
+                        <p class="game-description">Δύσκολο</p>
+                    </div>
+                    <div class="lock-overlay">
+                            <span class="lock-icon">🔒</span>
+                            <div class="points-required">Διαβάστε την ενότητα @i</div>
+                    </div>
+                </div>
+            </a>
+        }
+
+    }
+</div>

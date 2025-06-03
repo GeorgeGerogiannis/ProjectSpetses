@@ -4,7 +4,8 @@ namespace ProjectSpetses.Models
 {
     public class RegisterViewModel : LoginViewModel
     {
-        [Compare("Password", ErrorMessage = "Password doesn't match, Type again !")]
-        public string ConfirmPassword { get; set; }
+        [Required(ErrorMessage = "Παρακαλώ συμπληρώστε τον κωδικό πρόσβασης")]
+        [Compare("Password", ErrorMessage = "Ο κωδικός πρόσβασης δεν ταιριάζει!")]
+        public required string ConfirmPassword { get; set; }
     }
 }

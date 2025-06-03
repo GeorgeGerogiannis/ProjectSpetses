@@ -32,6 +32,10 @@ else
                             </div>
                             <p class="section-description">@exploreSection.Description</p>
                         </div>
+                        <div class="lock-overlay">
+                            <span class="lock-icon">🔒</span>
+                            <div class="points-required">@Model.Points/@exploreSection.PointsRequired</div>
+                        </div>
                     </div>
                 </a>
             }
@@ -40,8 +44,8 @@ else
                 <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                    asp-action="@nameof(ExploreController.Section)"
                    asp-route-Id="@exploreSection.Id"
-                   class="section-card-link @(Model.Completed[i] ? "completed" : "")">
-                    <div class="section-card @(Model.Completed[i] ? "completed" : "")">
+                   class="section-card-link @(Model.CompletedCategories[i] == Model.CategoryCount[i] ? "completed" : "")">
+                    <div class="section-card @(Model.CompletedCategories[i] == Model.CategoryCount[i] ? "completed" : "")">
                         <div class="section-thumbnail">
                             <img src="@exploreSection.ImageUrl" class="img-fluid rounded-start" alt="@exploreSection.Name">
                         </div>
@@ -51,6 +55,19 @@ else
                             </div>
                             <p class="section-description">@exploreSection.Description</p>
                         </div>
+                        @if (Model.CompletedCategories[i] == Model.CategoryCount[i])
+                        {
+                            <div class="completion-overlay">
+                                <span class="check-icon">✓</span>
+                                <div class="categories-progress">@Model.CompletedCategories[i]/@Model.CategoryCount[i]</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="progress-overlay">
+                                @Model.CompletedCategories[i]/@Model.CategoryCount[i]
+                            </div>
+                        }
                     </div>
                 </a>
             }

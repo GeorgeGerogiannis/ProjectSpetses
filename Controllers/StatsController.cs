@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
 using ProjectSpetses.Models;
-using System.Threading.Tasks;
 
 namespace ProjectSpetses.Controllers
 {
@@ -11,6 +10,7 @@ namespace ProjectSpetses.Controllers
         //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             //check if user is authenticated
@@ -25,26 +25,32 @@ namespace ProjectSpetses.Controllers
                 .Select(u => u.Username)
                 .FirstOrDefaultAsync();
 
-            //get the user's stats
+            //get the user's needed stats
             var stats = await _dbContext.Stats
                 .Where(s => s.Id == GetCurrentUserId())
                 .Select(s => new
                 {
                     s.TotalPoints,
                     s.CategoriesRead,
+                    s.NotificationsGiven,
+                    s.CreatedAt
                 })
                 .FirstOrDefaultAsync();
 
+            //create the model
             var model = new StatsViewModel
             {
                 Username = username,
-                TotalPoints = (uint)(stats?.TotalPoints),
-                CategoriesRead = (uint)stats?.CategoriesRead.Count
+                TotalPoints = stats.TotalPoints,
+                SectionsCompleted = (ushort)stats.NotificationsGiven.Count, // NotificationsGiven can be represented as a collection of sections completed
+                CategoriesCompleted = (ushort)stats.CategoriesRead.Count,
+                CreatedAt = stats.CreatedAt
             };
 
             return View(model);
         }
 
+        //gets the user's id from session
         private Guid GetCurrentUserId()
         {
             var currentUserId = User.FindFirst("User_id")?.Value;
