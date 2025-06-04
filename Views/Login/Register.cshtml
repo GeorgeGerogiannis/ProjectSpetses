@@ -2,8 +2,9 @@
 @{
     ViewData["Title"] = "Δημιουργία Λογαριασμού";
 }
+<link rel="stylesheet" href="~/css/login_register.css" />
 
-<h2>Δημιουργίστε Λογαριασμό</h2>
+<div class="title">Δημιουργίστε Λογαριασμό</div>
 
 <div class="mt-3">
     <form asp-action="@nameof(LoginController.Register)" method="post">
@@ -34,6 +35,9 @@
     </form>
 
     <div class="mt-3">
-        <a asp-action="@nameof(LoginController.Login)">Σύνδεση</a>
+        <a asp-action="@nameof(LoginController.Login)"
+           class="btn btn-secondary">
+            Σύνδεση
+        </a>
     </div>
 </div>

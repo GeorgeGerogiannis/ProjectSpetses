@@ -5,51 +5,158 @@
 
 <link rel="stylesheet" href="~/css/home.css" />
 
-<div class="container text-center">
-    @if (User.Identity.IsAuthenticated)
-    {
-        <h2>
-            Καλωσήρθατε, στο ProjectSpetses @User.Identity.Name!
-        </h2>
-        <p>
-            Μάθετε για τις Σπέτσες
-            <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-               asp-action="@nameof(ExploreController.Index)">
-                εδώ
-            </a>.
-        </p>
+<!-- welcome section -->
+<div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="container">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="welcome-header animate-fade-in">
+                    <h1 class="hero-title">
+                        <span class="greeting">Καλωσήρθατε πίσω,</span>
+                        <span class="username">@User.Identity.Name!</span>
+                    </h1>
+                    <p class="hero-subtitle">Συνεχίστε το ταξίδι σας στις όμορφες Σπέτσες</p>
+                </div>
+            }
+            else
+            {
+                <div class="welcome-header animate-fade-in">
+                    <h1 class="hero-title">Καλωσήρθατε στο ProjectSpetses</h1>
+                    <p class="hero-subtitle">Ανακαλύψτε τον πολιτισμό και την ιστορία των πανέμορφων Σπετσών</p>
+                    <div class="cta-buttons">
+                        <a class="btn btn-primary btn-lg pulse-animation"
+                           asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
+                           asp-action="@nameof(LoginController.Login)">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Σύνδεση
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
-        @if (Model != null)
+<!-- "main" content -->
+<div class="main-content">
+    <div class="container">
+        @if (User.Identity.IsAuthenticated)
         {
-            <div class="last-read-card">
-                <div class="last-read-card-body">
-                    <h5 class="last-read-card-title">Που σταμάτησες τελευταία φορά?</h5>
-                    <p class="last-read-card-text">
-                        Ενότητα: @Model.SectionName
-                        Υποενότητα: @Model.CategoryName
-                        Σελίδα: @Model.Page
-                    </p>
-                    <a class="btn btn-primary"
-                       asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                       asp-action="@nameof(ExploreController.Category)"
-                       asp-route-sectionId="@Model.SectionId"
-                       asp-route-Id="@Model.CategoryId"
-                       asp-route-page="@Model.Page">
-                        Συνέχισε το διάβασμα
-                    </a>
+            <!-- progress card -->
+            @if (Model != null)
+            {
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-8">
+                        <div class="progress-card slide-up">
+                            <div class="progress-card-header">
+                                <div class="progress-icon">
+                                    <i class="fas fa-bookmark"></i>
+                                </div>
+                                <h3>Που σταματήσατε τελευταία φορά;</h3>
+                            </div>
+                            <div class="progress-card-body">
+                                <div class="progress-details">
+                                    <div class="detail-item">
+                                        <span class="detail-label">Ενότητα:</span>
+                                        <span class="detail-value">@Model.SectionName</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Υποενότητα:</span>
+                                        <span class="detail-value">@Model.CategoryName</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">Σελίδα:</span>
+                                        <span class="detail-value">@Model.Page</span>
+                                    </div>
+                                </div>
+                                <a class="btn btn-success btn-lg continue-btn"
+                                   asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                                   asp-action="@nameof(ExploreController.Category)"
+                                   asp-route-sectionId="@Model.SectionId"
+                                   asp-route-Id="@Model.CategoryId"
+                                   asp-route-page="@Model.Page">
+                                    <i class="fas fa-play"></i>
+                                    Συνεχίστε το διάβασμα
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- quick actions -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="section-title text-center mb-4">Γρήγορες Ενέργειες</h2>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="action-card hover-lift">
+                        <div class="action-icon">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h4>Εξερεύνηση</h4>
+                        <p>Ανακαλύψτε τον πολιτισμό και την ιστορία των Σπετσών</p>
+                        <a class="btn btn-outline-primary"
+                           asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
+                           asp-action="@nameof(ExploreController.Index)">
+                            Εξερεύνηση
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="action-card hover-lift">
+                        <div class="action-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <h4>Δραστηριότητες</h4>
+                        <p>Δοκιμάστε τις γνώσεις σας</p>
+                        <a class="btn btn-outline-primary"
+                           asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
+                           asp-action="@nameof(GamesController.Index)">
+                            Δραστηριότητες
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="action-card hover-lift">
+                        <div class="action-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h4>Στατιστικά</h4>
+                        <p>Δείτε τα στατιστικά σας και την πρόοδό σας</p>
+                        <a class="btn btn-outline-primary"
+                           asp-controller="@nameof(StatsController)[..nameof(StatsController).LastIndexOf("Controller")]"
+                           asp-action="@nameof(StatsController.Index)">
+                            Στατιστικά
+                        </a>
+                    </div>
                 </div>
             </div>
         }
-    }
-    else
-    {
-        <h2>
-            Καλωσήρθατε! Παρακαλώ συνδεθείτε
-            <a asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
-               asp-action="@nameof(LoginController.Login)">
-                εδώ
-            </a>
-            για να απολαύσετε την εμπειρία μας.
-        </h2>
-    }
+    </div>
 </div>
+
+<!-- animations script -->
+<script>
+    // Add smooth animations on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up, .slide-up').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>

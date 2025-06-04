@@ -1,6 +1,6 @@
 ﻿@model ExploreViewModel
 @{
-    ViewData["Title"] = "Ενότητες";
+    ViewData["Title"] = "Εξερεύνηση";
 }
 
 <link rel="stylesheet" href="~/css/explore.css" />
@@ -8,13 +8,13 @@
 @if (Model.Sections.Count == 0)
 {
     <div class="text-center">
-        <h3 class="display-4">Δεν υπάρχουν ενότητες αυτή τη στιγμή</h3>
+        <h3 class="display-4">Δεν υπάρχουν ενότητες για εξερεύνηση αυτή τη στιγμή</h3>
     </div>
 }
 else
 {
     <div>
-        <h2>Επιλέξτε Ενότητα</h2>
+        <div class="title">Επιλέξτε Ενότητα</div>
         @* NOTE: section is a keyword (like @model), so avoid using it after '@'*@
         @for (int i = 0; i < Model.Sections.Count; i++)
         {
@@ -33,8 +33,10 @@ else
                             <p class="section-description">@exploreSection.Description</p>
                         </div>
                         <div class="lock-overlay">
-                            <span class="lock-icon">🔒</span>
-                            <div class="points-required">@Model.Points/@exploreSection.PointsRequired</div>
+                            <div class="lock-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="points-required">@Model.Points/@exploreSection.PointsRequired Πόντους</div>
                         </div>
                     </div>
                 </a>
@@ -58,7 +60,9 @@ else
                         @if (Model.CompletedCategories[i] == Model.CategoryCount[i])
                         {
                             <div class="completion-overlay">
-                                <span class="check-icon">✓</span>
+                                <div class="check-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
                                 <div class="categories-progress">@Model.CompletedCategories[i]/@Model.CategoryCount[i]</div>
                             </div>
                         }

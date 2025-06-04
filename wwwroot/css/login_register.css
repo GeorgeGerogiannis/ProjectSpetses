@@ -1,0 +1,11 @@
+﻿.title {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.form-label {
+    color: white;
+}

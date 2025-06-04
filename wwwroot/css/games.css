@@ -1,4 +1,12 @@
-﻿.game-grid {
+﻿.title {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.game-grid {
     padding: 10px;
     display: grid;
     grid-template-rows: repeat(2, 1fr);

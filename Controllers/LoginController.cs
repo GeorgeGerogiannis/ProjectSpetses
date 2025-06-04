@@ -109,7 +109,9 @@ namespace ProjectSpetses.Controllers
                 TotalPoints = 0,
                 CategoriesRead = [],
                 NotificationsGiven = [],
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CorrectAnswers = [],
+                WrongAnswers = []
             };
 
             //add the user and the stats to the database

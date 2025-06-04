@@ -1,11 +1,11 @@
 ﻿@model GamesViewModel
 @{
-    ViewData["Title"] = "Παιχνίδια";
+    ViewData["Title"] = "Δραστηριότητες";
 }
 
 <link rel="stylesheet" href="~/css/games.css" />
 
-<h2>Παιχνίδια</h2>
+<div class="title">Δραστηριότητες</div>
 
 <div class="game-grid">
     @for (ushort i = 1; i <= Model.SectionCount; i++)

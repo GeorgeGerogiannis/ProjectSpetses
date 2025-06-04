@@ -33,7 +33,9 @@ namespace ProjectSpetses.Controllers
                     s.TotalPoints,
                     s.CategoriesRead,
                     s.NotificationsGiven,
-                    s.CreatedAt
+                    s.CreatedAt,
+                    s.WrongAnswers,
+                    s.CorrectAnswers
                 })
                 .FirstOrDefaultAsync();
 
@@ -44,7 +46,9 @@ namespace ProjectSpetses.Controllers
                 TotalPoints = stats.TotalPoints,
                 SectionsCompleted = (ushort)stats.NotificationsGiven.Count, // NotificationsGiven can be represented as a collection of sections completed
                 CategoriesCompleted = (ushort)stats.CategoriesRead.Count,
-                CreatedAt = stats.CreatedAt
+                CreatedAt = stats.CreatedAt,
+                WrongAnswers = (uint)stats.WrongAnswers.Count,
+                CorrectAnswers = (uint)stats.CorrectAnswers.Count,
             };
 
             return View(model);

@@ -3,8 +3,14 @@
     ViewData["Title"] = "Στατιστικά";
 }
 
-<h1>Στατιστικά - @Model.Username</h1>
-<p>Μαθένετε από τις @Model.CreatedAt.ToString("d MMMM, yyyy")</p>
-<p>Πόντοι: @Model.TotalPoints</p>
-<p>Ολοκληρομένες Eνότητες: @Model.SectionsCompleted</p>
-<p>Ολοκληρομένες Υποενότητες: @Model.CategoriesCompleted</p>
+<link rel="stylesheet" href="~/css/stats.css" />
+
+<div class="title">Στατιστικά - @Model.Username</div>
+<p>
+    Μαθένετε από τις @Model.CreatedAt.ToString("d MMMM, yyyy")
+    Πόντοι: @Model.TotalPoints
+    Ολοκληρομένες Eνότητες: @Model.SectionsCompleted
+    Ολοκληρομένες Υποενότητες: @Model.CategoriesCompleted
+    Σωστές Απαντήσεις/Λάθος Απαντήσεις: @Model.CorrectAnswers/@Model.WrongAnswers (Λόγος: @(Model.WrongAnswers != 0 ? Model.CorrectAnswers/Model.WrongAnswers : "0"))
+</p>
+

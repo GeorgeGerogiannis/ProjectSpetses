@@ -5,7 +5,6 @@ namespace ProjectSpetses.Other
 {
     public class Hashing
     {
-        //public string Password;
         public Hashing()
         {
 

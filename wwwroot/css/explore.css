@@ -1,4 +1,12 @@
-﻿.section-card {
+﻿.title {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
+
+.section-card {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -8,18 +16,19 @@
     border-radius: 5px;
     overflow: hidden;
     border: none;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 
 .section-card-link {
     display: block;
     text-decoration: none;
     color: black;
-    transition: transform 0.2s ease;
+    transition: transform 0.3s ease;
 }
 
 .section-card-link:hover {
     transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     color: black;
 }
 
@@ -118,11 +127,12 @@
     display: block;
     text-decoration: none;
     color: black;
-    transition: transform 0.2s ease;
+    transition: transform 0.3s ease;
 }
 
 .section-card-link.completed:hover {
     transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     color: black;
 }
 
@@ -137,7 +147,7 @@
     overflow: hidden;
     border: 2px solid #28a745;
     position: relative;
-    transition: transform 0.2s;
+    transition: transform 0.3s;
 }
 
 .section-card.completed .completion-overlay {
@@ -180,7 +190,7 @@
     font-weight: 600;
     z-index: 5;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease;
 }
 
 .section-card-link:hover .progress-overlay {
