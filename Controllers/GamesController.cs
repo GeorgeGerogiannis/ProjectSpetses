@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
@@ -11,16 +12,26 @@ namespace ProjectSpetses.Controllers
         //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
 
-        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
+        public async Task Testing()
+        {
+            await StartGame(5, 
+                new List<ushort> { 1, 2, 3 });
+        }
+
+        public async Task StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
             List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
         {
+            //this might need "await" on every call
             //Load all items from the database
-            List<Quiz_item> quiz_items = await _dbContext.Quiz_items.ToListAsync();
             List<Blank_item> blank_items = await _dbContext.Blank_items.ToListAsync();
+            List<Quiz_item> quiz_items = await _dbContext.Quiz_items.ToListAsync();
             List<Match_item> match_items = await _dbContext.Match_items.ToListAsync();
 
             //ensure a minimum duration of 3 games
             if (duration < 3) duration = 3;
+
+            //variable to ensure enough Wordmatch games are selected
+            int matchGames = 0;
 
             //find the games dedicated to the Required IDs 
             //duration / 3 (rounded up)
@@ -93,6 +104,7 @@ namespace ProjectSpetses.Controllers
                         selectedGames.Add(matchItem);
                         match_items.RemoveAll(m => m.Id == matchItem.Id);
                         allRequired.RemoveAt(randomIndex);
+                        matchGames++;
                     }
                     //break if all required items are selected
                     if (allRequired.Count == 0) 
@@ -144,7 +156,90 @@ namespace ProjectSpetses.Controllers
                     int randomIndex = new Random().Next(match_items.Count);
                     selectedGames.Add(match_items[randomIndex]);
                     match_items.RemoveAt(randomIndex);
+                    matchGames++;
                 }
+            }
+
+            //ensures there are enough Match games to play
+            for (int i = 0; i < 3 - matchGames; i++)
+            {
+                //if there are no Match games selected, don't force them in
+                if (matchGames == 0)
+                    break;
+                //add a random Match game if there are any left
+                if (match_items.Count > 0)
+                {
+                    //add a random Match game if there are any left
+                    int randomIndex = new Random().Next(match_items.Count);
+                    selectedGames.Add(match_items[randomIndex]);
+                    match_items.RemoveAt(randomIndex);
+                }
+                else
+                {
+                    //if no Match games are left, make a placeholder Match game
+                    if (quiz_items.Count > 0)
+                    {
+                        Match_item matchItem = new Match_item
+                        {
+                            Id = 0,
+                            Image = "placeholder.png",
+                            Solution = "Default solution",
+                            SectionId = 0
+                        };
+                        selectedGames.Add(matchItem);
+                    }
+                }
+            }
+            //Start the games
+            HttpContext.Session.SetString("SelectedGames", 
+                    System.Text.Json.JsonSerializer.Serialize(selectedGames));
+            HttpContext.Session.SetString("Test", "I work");
+            NextGame();
+        }
+
+        public void NextGame()
+        {
+            string test = HttpContext.Session.GetString("Test");
+            Debug.WriteLine($"Test variable value: {test}");
+            //Debug.WriteLine("hello".GetType());
+
+            string json = HttpContext.Session.GetString("SelectedGames");
+            Debug.WriteLine($"{json}");
+            List<object> games = System.Text.Json.JsonSerializer.Deserialize<List<object>>(json);
+            Debug.WriteLine($"Behold!!!!{games}");
+            if (games.Count == 0)
+            {
+                //FinishGames();
+                int ttacer = 0;
+            }
+            else if (games[0] is Quiz_item quizItem)
+            {
+                games.RemoveAt(0);
+                HttpContext.Session.SetString("SelectedGames",
+                    System.Text.Json.JsonSerializer.Serialize(games));
+                Quiz(quizItem);
+            }
+            else if (games[0] is Blank_item blankItem)
+            {
+                games.RemoveAt(0);
+                HttpContext.Session.SetString("SelectedGames",
+                    System.Text.Json.JsonSerializer.Serialize(games));
+                FillBlank(blankItem);
+            }
+            else if (games[0] is Match_item matchItem)
+            {
+                //pointer problems? (renfrences lists)
+                List<object> noMatchGames = games.ToList();
+                List<Match_item> allMatches = new List<Match_item>();
+                foreach (var item in games)
+                {
+                    if (item is Match_item match)
+                    {
+                        allMatches.Add(match);
+                        noMatchGames.Remove((object)match);
+                    }
+                }
+                WordMatch(allMatches);
             }
         }
 
@@ -153,23 +248,12 @@ namespace ProjectSpetses.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Quiz()
+        public async Task<IActionResult> Quiz(Quiz_item quiz_item)
         {
             //This is adds the quiz items to the view
-
-            //This is where you do DB stuff
-            var quiz_items = await _dbContext.Quiz_items.ToListAsync();
-
-            //Testing data
-            //here i select 4 quizes from the DB since we dont have a selection method yet
-            quiz_items = new List<Quiz_item> { quiz_items[0], quiz_items[1], quiz_items[2], quiz_items[3] };
-
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
-            for (int i = 0; i < quiz_items.Count; i++)
-            {
-                quiz_items[i].Answers = ShuffleList(quiz_items[i].Answers);
-            }
-            return View(quiz_items);
+            quiz_item.Answers = ShuffleList(quiz_item.Answers);
+            return View(quiz_item);
         }
         
         public async Task<IActionResult> SubmitQuiz()
@@ -178,24 +262,17 @@ namespace ProjectSpetses.Controllers
             //the quiz page doesn't save the data in any form yet (use asp-for= and a model)
             return View(nameof(Index));
         }
-        public async Task<IActionResult> WordMatch()
+        public async Task<IActionResult> WordMatch(List<Match_item> match_items)
         {
-            //This is where you do DB stuff
-            var Match_items = await _dbContext.Match_items.ToListAsync();
-
-            //Testing data
-            //here i select 4 quizes from the DB since we dont have a selection method yet
-            Match_items = new List<Match_item> { Match_items[0], Match_items[1], Match_items[2], Match_items[3] };
-
             //get the drop list for the html
             List<String> dropList = new List<String>();
-            foreach (var item in Match_items)
+            foreach (var item in match_items)
             {
                 dropList.Add(item.Solution);
             }
             dropList = ShuffleList(dropList);
 
-            return View((Match_items, dropList));
+            return View((match_items, dropList));
         }
 
         public async Task<IActionResult> SubmitWordMatch()
@@ -204,23 +281,12 @@ namespace ProjectSpetses.Controllers
             //the WordMatch page doesn't save the data in any form yet (use asp-for= and a model)
             return View(nameof(Index));
         }
-        public async Task<IActionResult> FillBlank()
+        public async Task<IActionResult> FillBlank(Blank_item blank_item)
         {
-            //This is where you do DB stuff
-            var blank_items = await _dbContext.Blank_items.ToListAsync();
-
-            //Testing data
-            //here i select 4 quizes from the DB since we dont have a selection method yet
-            //blank_items = new List<Quiz_item> { blank_items[0], blank_items[1], blank_items[2], blank_items[3] };
-
+            //This is adds the blank items to the view
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
-            for (int i = 0; i < blank_items.Count; i++)
-            {
-                blank_items[i].Answers = ShuffleList(blank_items[i].Answers);
-            }
-
-
-            return View(blank_items);
+            blank_item.Answers = ShuffleList(blank_item.Answers);
+            return View(blank_item);
         }
         
         public static List<T> ShuffleList<T>(List<T> list)
