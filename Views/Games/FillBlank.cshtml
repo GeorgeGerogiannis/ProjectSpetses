@@ -1,28 +1,49 @@
-﻿@model List<ProjectSpetses.Models.Entities.Blank_item>
+﻿@model ProjectSpetses.Models.Entities.Blank_item
 
 <h1>Fill the blanks!</h1>
-<form asp-action="@nameof(GamesController.SubmitQuiz)" method="post">
+<form asp-action="@nameof(GamesController.SubmitFillBlank)" method="post">
 
-    @foreach (var quiz in Model)
-    {
-        <div>
-            <h3>@quiz.Description1 ____ @quiz.Description2</h3>
-            <ul>
-                @foreach (var answer in quiz.Answers)
-                {
-                    <li>
-                        <input type="radio"
-                               id="@quiz.Id@answer"
-                               name="@quiz.Id"
-                               value="@(quiz.Solution == answer ? "True" : "False")"
-                               required />
-                        <!-- The Value is visible if you inspect the browser page, this is a feature -->
-                        <label for="@quiz.Id@answer">@answer</label>
-                    </li>
-                }
-            </ul>
-        </div>
-    }
+    <div>
+        <h3>@Model.Description1 ____ @Model.Description2</h3>
+        <input type="hidden" name="Answers[0].QuestionId" value="@Model.Id" />
+        <input type="hidden" name="Answers[0].GameType" value="FillBlank" />
+        <ul>
+            @foreach (var answer in Model.Answers)
+            {
+                <li>
+                    <input type="radio"
+                           id="@Model.Id@answer"
+                           name="Answers[0].SelectedValue"
+                           value="@(Model.Solution == answer ? "True" : "False")"
+                           required />
+                    <label for="@Model.Id@answer">@answer</label>
+                </li>
+            }
+        </ul>
+    </div>
 
     <button type="submit">Submit</button>
 </form>
+
+@* @model List<ProjectSpetses.Models.Entities.Blank_item>
+
+@foreach (var quiz in Model)
+{
+    <div>
+        <h3>@quiz.Description1 ____ @quiz.Description2</h3>
+        <ul>
+            @foreach (var answer in quiz.Answers)
+            {
+                <li>
+                    <input type="radio"
+                           id="@quiz.Id@answer"
+                           name="@quiz.Id"
+                           value="@(quiz.Solution == answer ? "True" : "False")"
+                           required />
+                    <!-- The Value is visible if you inspect the browser page, this is a feature -->
+                    <label for="@quiz.Id@answer">@answer</label>
+                </li>
+            }
+        </ul>
+    </div>
+} *@

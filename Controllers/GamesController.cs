@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
+using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
 
 namespace ProjectSpetses.Controllers
@@ -13,48 +15,50 @@ namespace ProjectSpetses.Controllers
         //testing
         // Add this to your GamesController
 
-        [HttpGet]
-        public IActionResult Tester(string gameType, ushort? id)
-        {
-            if (string.IsNullOrEmpty(gameType) || id == null)
-            {
-                // Optionally, redirect to an error or index page
-                return RedirectToAction(nameof(Index));
-                return RedirectToAction(nameof(HomeController.Index),
-                    nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
-            }
+        //[HttpGet]
+        //public IActionResult Tester(string gameType, ushort? id)
+        //{
+        //    if (string.IsNullOrEmpty(gameType) || id == null)
+        //    {
+        //        // Optionally, redirect to an error or index page
+        //        return RedirectToAction(nameof(Index));
+        //        return RedirectToAction(nameof(HomeController.Index),
+        //            nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
+        //    }
 
-            switch (gameType)
-            {
-                case "Quiz":
-                    // You may need to load the Quiz_item from the database if your Quiz action expects the full object
-                    var quizItem = _dbContext.Quiz_items.FirstOrDefault(q => q.Id == id);
-                    if (quizItem != null)
-                        return RedirectToAction(nameof(Quiz), new { id = quizItem.Id });
-                    break;
-                case "FillBlank":
-                    var blankItem = _dbContext.Blank_items.FirstOrDefault(b => b.Id == id);
-                    if (blankItem != null)
-                        return RedirectToAction(nameof(FillBlank), new { id = blankItem.Id });
-                    break;
-                case "WordMatch":
-                    var matchItem = _dbContext.Match_items.FirstOrDefault(m => m.Id == id);
-                    if (matchItem != null)
-                        return RedirectToAction(nameof(WordMatch), new { id = matchItem.Id });
-                    break;
-            }
+        //    switch (gameType)
+        //    {
+        //        case "Quiz":
+        //            // You may need to load the Quiz_item from the database if your Quiz action expects the full object
+        //            var quizItem = _dbContext.Quiz_items.FirstOrDefault(q => q.Id == id);
+        //            if (quizItem != null)
+        //                return RedirectToAction(nameof(Quiz), new { id = quizItem.Id });
+        //            break;
+        //        case "FillBlank":
+        //            var blankItem = _dbContext.Blank_items.FirstOrDefault(b => b.Id == id);
+        //            if (blankItem != null)
+        //                return RedirectToAction(nameof(FillBlank), new { id = blankItem.Id });
+        //            break;
+        //        case "WordMatch":
+        //            var matchItem = _dbContext.Match_items.FirstOrDefault(m => m.Id == id);
+        //            if (matchItem != null)
+        //                return RedirectToAction(nameof(WordMatch), new { id = matchItem.Id });
+        //            break;
+        //    }
 
-            // If not found or invalid type, redirect to index
-            return RedirectToAction(nameof(Index));
-        }
+        //    // If not found or invalid type, redirect to index
+        //    return RedirectToAction(nameof(Index));
+        //}
         //testing
 
         //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
+        private const string selectedGamesSession = "SelectedGames";
+        private const string gameResultsSession = "GameResults";
 
         public async Task<IActionResult> Testing()
         {
-            var page = await StartGame(5, 
+            var page = await StartGame(5,
                 new List<ushort> { 1, 2, 3 });
             return page;
         }
@@ -148,12 +152,12 @@ namespace ProjectSpetses.Controllers
                         matchGames++;
                     }
                     //break if all required items are selected
-                    if (allRequired.Count == 0) 
-                        break; 
+                    if (allRequired.Count == 0)
+                        break;
                 }
             }
             //adjust the duration in case any required games where added
-            duration -= selectedGames.Count; 
+            duration -= selectedGames.Count;
 
             //remove items that are not in the selected sections
             quiz_items = quiz_items.Where(q => sections.Contains(q.SectionId)).ToList();
@@ -162,7 +166,7 @@ namespace ProjectSpetses.Controllers
 
             //Q for Quiz, B for Blank, M for Match
             List<char> gameNames = ['Q', 'B', 'M'];
-            
+
             //select random games
             for (int i = 0; i < duration; i++)
             {
@@ -174,8 +178,8 @@ namespace ProjectSpetses.Controllers
                 if (match_items.Count == 0)
                     gameNames.Remove('M');
                 //if no game types are left, break the loop
-                if (gameNames.Count == 0) 
-                    break; 
+                if (gameNames.Count == 0)
+                    break;
 
                 //select a random game type
                 int gameType = new Random().Next(gameNames.Count);
@@ -239,7 +243,8 @@ namespace ProjectSpetses.Controllers
                 Data = g
             }).ToList();
             //save them in session
-            HttpContext.Session.SetString("SelectedGames", JsonSerializer.Serialize(wrappedGames));
+            HttpContext.Session.SetString(selectedGamesSession, JsonSerializer.Serialize(wrappedGames));
+            HttpContext.Session.SetString(gameResultsSession, "");
 
             //HttpContext.Session.SetString("Test", "I work");
             return await NextGame();
@@ -251,10 +256,10 @@ namespace ProjectSpetses.Controllers
             //string test = HttpContext.Session.GetString("Test");
             //Debug.WriteLine($"Test variable value: {test}");
 
-            string json = HttpContext.Session.GetString("SelectedGames");
-            var wrappedGames = JsonSerializer.Deserialize<List<GameWrapper>>(json);
+            string json = HttpContext.Session.GetString(selectedGamesSession);
+            var deserializedGames = JsonSerializer.Deserialize<List<GameWrapper>>(json);
             List<object> selectedGames = new List<object>();
-            foreach (var game in wrappedGames)
+            foreach (var game in deserializedGames)
             {
                 switch (game.Type)
                 {
@@ -275,26 +280,37 @@ namespace ProjectSpetses.Controllers
                         break;
                 }
             }
-            Debug.WriteLine($"Behold!!!!{selectedGames}");
+            Debug.WriteLine($"%%%%%Behold!!!!{selectedGames.Count}");
 
             //redirect to the game pages
             if (selectedGames.Count == 0)
             {
-                //FinishGames();
-                return null;
+                return FinishGames();
             }
             else if (selectedGames[0] is Quiz_item quizItem)
             {
                 selectedGames.RemoveAt(0);
-                HttpContext.Session.SetString("SelectedGames",
-                    JsonSerializer.Serialize(selectedGames));
+                //wrap the games in a GameWrapper to help with deserialization
+                var wrappedGames = selectedGames.Select(g => new GameWrapper
+                {
+                    Type = g.GetType().Name,
+                    Data = g
+                }).ToList();
+                //save them in session
+                HttpContext.Session.SetString(selectedGamesSession, JsonSerializer.Serialize(wrappedGames));
                 return RedirectToAction(nameof(Quiz), new { id = quizItem.Id });
             }
             else if (selectedGames[0] is Blank_item blankItem)
             {
                 selectedGames.RemoveAt(0);
-                HttpContext.Session.SetString("SelectedGames",
-                    JsonSerializer.Serialize(selectedGames));
+                //wrap the games in a GameWrapper to help with deserialization
+                var wrappedGames = selectedGames.Select(g => new GameWrapper
+                {
+                    Type = g.GetType().Name,
+                    Data = g
+                }).ToList();
+                //save them in session
+                HttpContext.Session.SetString(selectedGamesSession, JsonSerializer.Serialize(wrappedGames));
                 return RedirectToAction(nameof(FillBlank), new { id = blankItem.Id });
             }
             else if (selectedGames[0] is Match_item matchItem)
@@ -310,13 +326,19 @@ namespace ProjectSpetses.Controllers
                         noMatchGames.Remove((object)match);
                     }
                 }
-                HttpContext.Session.SetString("SelectedGames", 
-                    JsonSerializer.Serialize(noMatchGames));
+                //wrap the games in a GameWrapper to help with deserialization
+                var wrappedGames = noMatchGames.Select(g => new GameWrapper
+                {
+                    Type = g.GetType().Name,
+                    Data = g
+                }).ToList();
+                //save them in session
+                HttpContext.Session.SetString(selectedGamesSession, JsonSerializer.Serialize(wrappedGames));
                 return RedirectToAction(nameof(WordMatch), new { ids = allMatches.Select(m => m.Id).ToList() });
             }
             else
             {
-                //if no game is left, return to the index page
+                //This shoud NEVER happen
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -335,13 +357,32 @@ namespace ProjectSpetses.Controllers
             return View(quiz_item);
 
         }
-        
-        public async Task<IActionResult> SubmitQuiz()
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitQuiz(GameSubmissionViewModel submission)
         {
-            //this is what we do with the quiz data
-            //the quiz page doesn't save the data in any form yet (use asp-for= and a model)
-            return View(nameof(Index));
+            //save the quiz results in session
+            List<GameAnswerViewModel> oldResults = new();
+
+            string jsonResults = HttpContext.Session.GetString(gameResultsSession);
+            if (!string.IsNullOrEmpty(jsonResults))
+            {
+                // make a list of the ansewrs or an empty list if the results is empty
+                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? new List<GameAnswerViewModel>();
+            }
+
+            // Add new answers to the results
+            if (submission.Answers != null)
+            {
+                oldResults.AddRange(submission.Answers);
+            }
+
+            // Save updated results back to session
+            HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
+
+            return await NextGame();
         }
+
         public async Task<IActionResult> WordMatch(List<ushort> ids)
         {
             var match_items = await _dbContext.Match_items
@@ -357,11 +398,31 @@ namespace ProjectSpetses.Controllers
             return View((match_items, dropList));
         }
 
-        public async Task<IActionResult> SubmitWordMatch()
+        public async Task<IActionResult> SubmitWordMatch(GameSubmissionViewModel submission)
         {
-            //this is what we do with the WordMatch data
-            //the WordMatch page doesn't save the data in any form yet (use asp-for= and a model)
-            return View(nameof(Index));
+            //save the word Match results in session
+            List<GameAnswerViewModel> oldResults = new();
+
+            string jsonResults = HttpContext.Session.GetString(gameResultsSession);
+            if (!string.IsNullOrEmpty(jsonResults))
+            {
+                // make a list of the ansewrs or an empty list if the results is empty
+                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? new List<GameAnswerViewModel>();
+            }
+
+            // Add new answers to the results
+            if (submission.Answers != null)
+            {
+                oldResults.AddRange(submission.Answers);
+            }
+
+            //testing
+            Debug.WriteLine($"Answers: {JsonSerializer.Serialize(submission.Answers)}");
+
+            // Save updated results back to session
+            HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
+
+            return await NextGame();
         }
         public async Task<IActionResult> FillBlank(ushort id)
         {
@@ -371,11 +432,42 @@ namespace ProjectSpetses.Controllers
             blank_item.Answers = ShuffleList(blank_item.Answers);
             return View(blank_item);
         }
-        
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitFillBlank(GameSubmissionViewModel submission)
+        {
+            //You COULD just use SubmitQuiz, it's the same thing...
+            //save the blank results in session
+            List<GameAnswerViewModel> oldResults = new();
+
+            string jsonResults = HttpContext.Session.GetString(gameResultsSession);
+            if (!string.IsNullOrEmpty(jsonResults))
+            {
+                // make a list of the ansewrs or an empty list if the results is empty
+                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? new List<GameAnswerViewModel>();
+            }
+
+            // Add new answers to the results
+            if (submission.Answers != null)
+            {
+                oldResults.AddRange(submission.Answers);
+            }
+
+            // Save updated results back to session
+            HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
+
+            return await NextGame();
+        }
+
         public static List<T> ShuffleList<T>(List<T> list)
         {//this shuffles String lists to avoid obvious tests
             Random random = new Random();
             return list.OrderBy(_ => random.Next()).ToList();
+        }
+
+        public IActionResult FinishGames()
+        {
+            return RedirectToAction(nameof(Index), "Home");
         }
     }
 }

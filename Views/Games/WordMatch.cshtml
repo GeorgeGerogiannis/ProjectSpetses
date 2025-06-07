@@ -69,7 +69,7 @@
             <section class="palette">
                 @foreach (var item in matchItems)
                 {
-                    <img src="@item.Image" alt="/images/placeholder.png" id="@item.Id Image" draggable="true" ondragstart="dragstartHandler(event)" data-match="@item.Id Word">
+                    <img src="@item.Image" alt="/images/placeholder.png" id="@item.Id" draggable="true" ondragstart="dragstartHandler(event)" data-match="@item.Id Solution">
                 }
             </section>
         </div>
@@ -83,19 +83,19 @@
                     {
                         if (item.Solution == option)
                         {
-                            <div class="dropzone" id="@item.Id" ondragover="dragoverHandler(event)"
-                             ondrop="dropHandler(event)" data-accept="@item.Id Image">
-                                <span class="droptext" id="@item.Id">@item.Solution</span>
+                            <div class="dropzone" id="@item.Id Solution" ondragover="dragoverHandler(event)"
+                             ondrop="dropHandler(event)" data-accept="@item.Id">
+                                <span class="droptext" id="@item.Id Solution Span">@item.Solution</span>
                             </div>
+                            int optionIndex = dropList.IndexOf(option);
+							<input type="hidden" name="Answers[@optionIndex].GameType" value="Quiz" />
+                            <input type="hidden" name="Answers[@optionIndex].QuestionId" value="" />
+                            <input type="hidden" name="Answers[@optionIndex].SelectedValue" value="" />
                         }
                     }
-                    
                 }
             </section>
         </div>
-
-        <!-- Where we inject hidden form inputs -->
-        <div id="hidden-inputs"></div>
 
         <div class="actions">
             <button type="submit">Submit Answers</button>
@@ -119,66 +119,95 @@
             const dropzone = ev.currentTarget;
 
             // Prevent dropping if already occupied
-            if (dropzone.querySelector('img')) return;
-            
-            //helpful code bellow 
+            if (dropzone.querySelector('img')) 
+                return;
+
+	        //unhide the span text from the image's previous position (it it wasn't the container)
             const previousDrop = draggedEl.closest('.dropzone');
             if (previousDrop) {
                 const oldSpan = previousDrop.querySelector('span');
                 if (oldSpan) {
 ;                   oldSpan.removeAttribute("hidden");
+                }
+                //Clear the QuestionId in the previous dropzone
+                const prevQuestionId = previousDrop.querySelector('input[type="hidden"][name$=".QuestionId"]');
+                if (prevQuestionId) {
+                    prevQuestionId.value = "";
+                }
+                // Clear selected value in the previous dropzone
+                const prevSelected = previousDrop.querySelector('input[type="hidden"][name$=".SelectedValue"]');
+                if (prevSelected) {
+                    prevSelected.value = "";
 				}
             }
-            
-            //WIP
 
             //removing the new span
             const newSpan = dropzone.querySelector('span');
             newSpan.setAttribute("hidden", false);
 
+            // Set the QuestionId value in the new dropzone to match the image's
+            const inputQuestionId = dropzone.querySelector('input[type="hidden"][name$=".QuestionId"]');
+            inputQuestionId.value = draggedEl.id;
+            //Set whether its right or false into the Selected Value
+            const inputSelected = dropzone.querySelector('input[type="hidden"][name$=".SelectedValue"]');
+            if draggedEl.getAttribute('data-match') === dropzone.id) {
+                inputSelected.value = "True";
+            } else {
+                inputSelected.value = "False";
+		    }
+            
+            //add image to dropzone
             dropzone.appendChild(draggedEl);
         }
 
         function resetForm() {
             const palette = document.querySelector('.palette');
+			//clear all dropzones and move images back to palette
             document.querySelectorAll('.dropzone').forEach(zone => {
                 const img = zone.querySelector('img');
-                if (img) palette.appendChild(img);
+                if (img)
+                    palette.appendChild(img);
             });
+			//unhide all span texts
             document.querySelectorAll('.droptext').forEach(span => {
                 if (span.hasAttribute('hidden')) {
                     span.removeAttribute('hidden');
                 }
             });
-            document.getElementById('hidden-inputs').innerHTML = '';
+            // Clear all QuestionId hidden fields
+            document.querySelectorAll('input[type="hidden"][name$=".QuestionId"]').forEach(input => {
+                input.value = "";
+            });
+            //Clear all SelectedValue hidden fields
+            document.querySelectorAll('input[type="hidden"][name$=".SelectedValue"]').forEach(input => {
+                input.value = "";
+            });
         }
 
-
+        //form submission code
         document.getElementById('match-form').addEventListener('submit', function (e) {
-            const inputContainer = document.getElementById('hidden-inputs');
-            inputContainer.innerHTML = '';
-
+            //check all dropzones to see they are full
             const zones = document.querySelectorAll('.dropzone');
             let allFilled = true;
-
             zones.forEach(zone => {
-            const img = zone.querySelector('img');
-            if (!img) {
-                allFilled = false;
-            }
-            const isCorrect = img && img.id === zone.dataset.accept;
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = zone.id;
-            input.value = isCorrect;
-            inputContainer.appendChild(input);
-            });
+                const img = zone.querySelector('img');
+                if (!img) {
+                    allFilled = false;
+                }
+                if (!allFilled) {
+                    alert('Not all boxes have been filled');
+                    e.preventDefault();
+                    return false;
+                }
 
-            if (!allFilled) {
-                alert('Not all boxes have been filled');
-                e.preventDefault();
-                return false;
-            }
+                //pre session input system
+                // const isCorrect = img && img.id === zone.dataset.accept;
+                // const input = document.createElement('input');
+                // input.type = 'hidden';
+                // input.name = zone.id;
+                // input.value = isCorrect;
+                // inputContainer.appendChild(input);
+            });
         });
 
     </script>
