@@ -3,7 +3,12 @@
 }
 <footer class="border-top footer text-muted">
     <div class="container">
-        Testing - <a asp-area="" asp-controller="Games" asp-action="Testing">Testing</a>
+        Testing - 
+        <a 
+           asp-controller="Games" 
+           asp-action="@nameof(GamesController.Testing)">
+           Testing fun
+       </a>
     </div>
     <div>
         Testing - <a asp-area="" asp-controller="Games" asp-action="WordMatch">WordMatch</a>
@@ -11,4 +16,9 @@
     <div>
         Testing - <a asp-area="" asp-controller="Games" asp-action="FillBlank">Fill Blanks</a>
     </div>
+    <form asp-controller="Games" asp-action="Tester" method="get">
+        <input type="hidden" name="gameType" value="Quiz" />
+        <input type="hidden" name="id" value="5" />
+        <button type="submit">Start Quiz 5</button>
+    </form>
 </footer>

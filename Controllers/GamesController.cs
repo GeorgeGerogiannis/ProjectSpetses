@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectSpetses.Data;
@@ -9,16 +10,56 @@ namespace ProjectSpetses.Controllers
 {
     public class GamesController(ApplicationDbContext dbContext) : Controller
     {
+        //testing
+        // Add this to your GamesController
+
+        [HttpGet]
+        public IActionResult Tester(string gameType, ushort? id)
+        {
+            if (string.IsNullOrEmpty(gameType) || id == null)
+            {
+                // Optionally, redirect to an error or index page
+                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(HomeController.Index),
+                    nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
+            }
+
+            switch (gameType)
+            {
+                case "Quiz":
+                    // You may need to load the Quiz_item from the database if your Quiz action expects the full object
+                    var quizItem = _dbContext.Quiz_items.FirstOrDefault(q => q.Id == id);
+                    if (quizItem != null)
+                        return RedirectToAction(nameof(Quiz), new { id = quizItem.Id });
+                    break;
+                case "FillBlank":
+                    var blankItem = _dbContext.Blank_items.FirstOrDefault(b => b.Id == id);
+                    if (blankItem != null)
+                        return RedirectToAction(nameof(FillBlank), new { id = blankItem.Id });
+                    break;
+                case "WordMatch":
+                    var matchItem = _dbContext.Match_items.FirstOrDefault(m => m.Id == id);
+                    if (matchItem != null)
+                        return RedirectToAction(nameof(WordMatch), new { id = matchItem.Id });
+                    break;
+            }
+
+            // If not found or invalid type, redirect to index
+            return RedirectToAction(nameof(Index));
+        }
+        //testing
+
         //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
 
-        public async Task Testing()
+        public async Task<IActionResult> Testing()
         {
-            await StartGame(5, 
+            var page = await StartGame(5, 
                 new List<ushort> { 1, 2, 3 });
+            return page;
         }
 
-        public async Task StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
+        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
             List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
         {
             //this might need "await" on every call
@@ -191,47 +232,77 @@ namespace ProjectSpetses.Controllers
                 }
             }
             //Start the games
-            HttpContext.Session.SetString("SelectedGames", 
-                    System.Text.Json.JsonSerializer.Serialize(selectedGames));
-            HttpContext.Session.SetString("Test", "I work");
-            NextGame();
+            //wrap the games in a GameWrapper to help with deserialization
+            var wrappedGames = selectedGames.Select(g => new GameWrapper
+            {
+                Type = g.GetType().Name,
+                Data = g
+            }).ToList();
+            //save them in session
+            HttpContext.Session.SetString("SelectedGames", JsonSerializer.Serialize(wrappedGames));
+
+            //HttpContext.Session.SetString("Test", "I work");
+            return await NextGame();
         }
 
-        public void NextGame()
+        [HttpGet]
+        public async Task<IActionResult> NextGame()
         {
-            string test = HttpContext.Session.GetString("Test");
-            Debug.WriteLine($"Test variable value: {test}");
-            //Debug.WriteLine("hello".GetType());
+            //string test = HttpContext.Session.GetString("Test");
+            //Debug.WriteLine($"Test variable value: {test}");
 
             string json = HttpContext.Session.GetString("SelectedGames");
-            Debug.WriteLine($"{json}");
-            List<object> games = System.Text.Json.JsonSerializer.Deserialize<List<object>>(json);
-            Debug.WriteLine($"Behold!!!!{games}");
-            if (games.Count == 0)
+            var wrappedGames = JsonSerializer.Deserialize<List<GameWrapper>>(json);
+            List<object> selectedGames = new List<object>();
+            foreach (var game in wrappedGames)
+            {
+                switch (game.Type)
+                {
+                    case nameof(Quiz_item):
+                        var quiz = JsonSerializer.Deserialize<Quiz_item>(game.Data.ToString());
+                        // use quiz
+                        selectedGames.Add(quiz);
+                        break;
+                    case nameof(Blank_item):
+                        var blank = JsonSerializer.Deserialize<Blank_item>(game.Data.ToString());
+                        // use blank
+                        selectedGames.Add(blank);
+                        break;
+                    case nameof(Match_item):
+                        var match = JsonSerializer.Deserialize<Match_item>(game.Data.ToString());
+                        // use match
+                        selectedGames.Add(match);
+                        break;
+                }
+            }
+            Debug.WriteLine($"Behold!!!!{selectedGames}");
+
+            //redirect to the game pages
+            if (selectedGames.Count == 0)
             {
                 //FinishGames();
-                int ttacer = 0;
+                return null;
             }
-            else if (games[0] is Quiz_item quizItem)
+            else if (selectedGames[0] is Quiz_item quizItem)
             {
-                games.RemoveAt(0);
+                selectedGames.RemoveAt(0);
                 HttpContext.Session.SetString("SelectedGames",
-                    System.Text.Json.JsonSerializer.Serialize(games));
-                Quiz(quizItem);
+                    JsonSerializer.Serialize(selectedGames));
+                return RedirectToAction(nameof(Quiz), new { id = quizItem.Id });
             }
-            else if (games[0] is Blank_item blankItem)
+            else if (selectedGames[0] is Blank_item blankItem)
             {
-                games.RemoveAt(0);
+                selectedGames.RemoveAt(0);
                 HttpContext.Session.SetString("SelectedGames",
-                    System.Text.Json.JsonSerializer.Serialize(games));
-                FillBlank(blankItem);
+                    JsonSerializer.Serialize(selectedGames));
+                return RedirectToAction(nameof(FillBlank), new { id = blankItem.Id });
             }
-            else if (games[0] is Match_item matchItem)
+            else if (selectedGames[0] is Match_item matchItem)
             {
                 //pointer problems? (renfrences lists)
-                List<object> noMatchGames = games.ToList();
+                List<object> noMatchGames = selectedGames.ToList();
                 List<Match_item> allMatches = new List<Match_item>();
-                foreach (var item in games)
+                foreach (var item in selectedGames)
                 {
                     if (item is Match_item match)
                     {
@@ -239,7 +310,14 @@ namespace ProjectSpetses.Controllers
                         noMatchGames.Remove((object)match);
                     }
                 }
-                WordMatch(allMatches);
+                HttpContext.Session.SetString("SelectedGames", 
+                    JsonSerializer.Serialize(noMatchGames));
+                return RedirectToAction(nameof(WordMatch), new { ids = allMatches.Select(m => m.Id).ToList() });
+            }
+            else
+            {
+                //if no game is left, return to the index page
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -248,12 +326,14 @@ namespace ProjectSpetses.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> Quiz(Quiz_item quiz_item)
+        public async Task<IActionResult> Quiz(ushort id)
         {
-            //This is adds the quiz items to the view
+            //This is adds the quiz item(s) to the view
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
+            var quiz_item = await _dbContext.Quiz_items.FirstOrDefaultAsync(q => q.Id == id);
             quiz_item.Answers = ShuffleList(quiz_item.Answers);
             return View(quiz_item);
+
         }
         
         public async Task<IActionResult> SubmitQuiz()
@@ -262,8 +342,11 @@ namespace ProjectSpetses.Controllers
             //the quiz page doesn't save the data in any form yet (use asp-for= and a model)
             return View(nameof(Index));
         }
-        public async Task<IActionResult> WordMatch(List<Match_item> match_items)
+        public async Task<IActionResult> WordMatch(List<ushort> ids)
         {
+            var match_items = await _dbContext.Match_items
+                .Where(m => ids.Contains(m.Id))
+                .ToListAsync();
             //get the drop list for the html
             List<String> dropList = new List<String>();
             foreach (var item in match_items)
@@ -271,7 +354,6 @@ namespace ProjectSpetses.Controllers
                 dropList.Add(item.Solution);
             }
             dropList = ShuffleList(dropList);
-
             return View((match_items, dropList));
         }
 
@@ -281,10 +363,11 @@ namespace ProjectSpetses.Controllers
             //the WordMatch page doesn't save the data in any form yet (use asp-for= and a model)
             return View(nameof(Index));
         }
-        public async Task<IActionResult> FillBlank(Blank_item blank_item)
+        public async Task<IActionResult> FillBlank(ushort id)
         {
             //This is adds the blank items to the view
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
+            var blank_item = await _dbContext.Blank_items.FirstOrDefaultAsync(b => b.Id == id);
             blank_item.Answers = ShuffleList(blank_item.Answers);
             return View(blank_item);
         }
