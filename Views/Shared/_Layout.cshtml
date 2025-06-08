@@ -11,9 +11,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand text-black"
+                <a class="navbar-brand text-white"
                    asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
                    asp-action="@nameof(HomeController.Index)">
                     ProjectΣπέτσες
@@ -25,7 +25,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-black"
+                            <a class="nav-link text-white"
                                asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
                                asp-action="@nameof(HomeController.Index)">
                                 Αρχική
@@ -39,7 +39,7 @@
                         {
                             @* Navigation for guests (not logged in) *@
                             <li class="nav-item">
-                                <a class="nav-link text-black"
+                                <a class="nav-link text-white"
                                    asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(LoginController.Login)">
                                     Σύνδεση
@@ -50,28 +50,28 @@
                         {
                             @* Content for logged-in users *@ 
                             <li class="nav-item">
-                                <a class="nav-link text-black"
+                                <a class="nav-link text-white"
                                    asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(ExploreController.Index)">
                                     Εξερεύνηση
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-black"
+                                <a class="nav-link text-white"
                                    asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(GamesController.Index)">
                                     Δραστηριότητες
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-black"
+                                <a class="nav-link text-white"
                                    asp-controller="@nameof(StatsController)[..nameof(StatsController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(StatsController.Index)">
                                     Στατιστικά
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-black"
+                                <a class="nav-link text-white"
                                    asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
                                    asp-action="@nameof(LoginController.Logout)">
                                     Αποσύνδεση
@@ -86,6 +86,9 @@
 
     <div class="container">
         <main role="main" class="pb-3">
+            <div class="background">
+                <div class="overlay"></div>
+            </div>
             @RenderBody()
         </main>
     </div>

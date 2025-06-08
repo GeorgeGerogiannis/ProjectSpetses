@@ -25,14 +25,12 @@
                 <div class="welcome-header animate-fade-in">
                     <h1 class="hero-title">Καλωσήρθατε στο ProjectSpetses</h1>
                     <p class="hero-subtitle">Ανακαλύψτε τον πολιτισμό και την ιστορία των πανέμορφων Σπετσών</p>
-                    <div class="cta-buttons">
-                        <a class="btn btn-primary btn-lg pulse-animation"
-                           asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
-                           asp-action="@nameof(LoginController.Login)">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Σύνδεση
-                        </a>
-                    </div>
+                    <a class="btn btn-login btn-lg"
+                       asp-controller="@nameof(LoginController)[..nameof(LoginController).LastIndexOf("Controller")]"
+                       asp-action="@nameof(LoginController.Login)">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Σύνδεση
+                    </a>
                 </div>
             }
         </div>
@@ -87,7 +85,7 @@
             }
 
             <!-- quick actions -->
-            <div class="row mb-5">
+            <div class="action-section row">
                 <div class="col-12">
                     <h2 class="section-title text-center mb-4">Γρήγορες Ενέργειες</h2>
                 </div>
