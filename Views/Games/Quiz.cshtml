@@ -16,7 +16,9 @@
                             name="Answers[0].SelectedValue"
                             value="@(Model.Solution == answer ? "True" : "False")"
                             required />
-                    <label for="@Model.Id@answer">@answer</label>
+                    <label for="@Model.Id@answer">
+                        @answer
+                    </label>
                 </li>
             }
         </ul>

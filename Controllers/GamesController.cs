@@ -17,7 +17,7 @@ namespace ProjectSpetses.Controllers
         private const string selectedGamesSession = "SelectedGames";
         private const string gameResultsSession = "GameResults";
 
-        public async Task<IActionResult> StartGameConverter(int duration, string sections, string difficulty,
+        public async Task<IActionResult> StartGameConverter(int duration, string sections, string? difficulty,
             string? requiredQuiz, string? requiredBlank, string? requiredMatch)
         {
             //this function converts the parameters from the html to their inteded types
@@ -58,7 +58,7 @@ namespace ProjectSpetses.Controllers
              */
         }
 
-        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, string difficulty, List<ushort>? requiredQuiz = null,
+        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, string? difficulty = null, List<ushort>? requiredQuiz = null,
             List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
         {
             //this might need "await" on every call
@@ -158,6 +158,13 @@ namespace ProjectSpetses.Controllers
             quiz_items = quiz_items.Where(q => sections.Contains(q.SectionId)).ToList();
             blank_items = blank_items.Where(b => sections.Contains(b.SectionId)).ToList();
             match_items = match_items.Where(m => sections.Contains(m.SectionId)).ToList();
+            //remove items that are not in the selected difficulty(if selected)
+            if (difficulty != null)
+            {
+                quiz_items = quiz_items.Where(q => q.Difficulty == difficulty).ToList();
+                blank_items = blank_items.Where(b => b.Difficulty == difficulty).ToList();
+                match_items = match_items.Where(m => m.Difficulty == difficulty).ToList();
+            }
 
             //Q for Quiz, B for Blank, M for Match
             List<char> gameNames = ['Q', 'B', 'M'];
