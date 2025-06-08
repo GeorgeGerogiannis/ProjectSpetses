@@ -32,7 +32,7 @@ namespace ProjectSpetses.Controllers
                 {
                     s.TotalPoints,
                     s.CategoriesRead,
-                    s.NotificationsGiven,
+                    s.SectionsCompleted,
                     s.CreatedAt,
                     s.WrongAnswers,
                     s.CorrectAnswers
@@ -44,7 +44,7 @@ namespace ProjectSpetses.Controllers
             {
                 Username = username,
                 TotalPoints = stats.TotalPoints,
-                SectionsCompleted = (ushort)stats.NotificationsGiven.Count, // NotificationsGiven can be represented as a collection of sections completed
+                SectionsCompleted = (ushort)stats.SectionsCompleted.Count,
                 CategoriesCompleted = (ushort)stats.CategoriesRead.Count,
                 CreatedAt = stats.CreatedAt,
                 WrongAnswers = (uint)stats.WrongAnswers.Count,

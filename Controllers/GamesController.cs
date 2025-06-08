@@ -19,6 +19,12 @@ namespace ProjectSpetses.Controllers
         public async Task<IActionResult> StartGameConverter(int duration, string sections, string difficulty,
             string? requiredQuiz, string? requiredBlank, string? requiredMatch)
         {
+            //check if user is authenticated
+            if (!User.Identity.IsAuthenticated)
+            {
+                return NotFound("Something Went Wrong");
+            }
+
             //this function converts the parameters from the html to their inteded types
             static List<ushort> ParseList(string? csv) =>
                 string.IsNullOrWhiteSpace(csv)
@@ -34,6 +40,18 @@ namespace ProjectSpetses.Controllers
             var quizList = string.IsNullOrWhiteSpace(requiredQuiz) ? null : ParseList(requiredQuiz);
             var blankList = string.IsNullOrWhiteSpace(requiredBlank) ? null : ParseList(requiredBlank);
             var matchList = string.IsNullOrWhiteSpace(requiredMatch) ? null : ParseList(requiredMatch);
+
+            //check if the user has unlocked the games for the selected sections
+            var unlockledSections = await _dbContext.Stats
+                .Where(s => s.Id == GetCurrentUserId())
+                .Select(s => s.SectionsCompleted)
+                .FirstOrDefaultAsync();
+
+            //if the user has not unlocked one of the sections, redirect to the games page
+            if (unlockledSections == null || !sectionList.All(unlockledSections.Contains))
+            { 
+                return RedirectToAction(nameof(Index), nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]);
+            }
 
             return RedirectToAction(nameof(StartGame), new
             {
@@ -78,7 +96,7 @@ namespace ProjectSpetses.Controllers
             if (duration % 3 != 0) requiredDuration++;
 
             //selected games
-            var selectedGames = new List<object>();
+            List<object> selectedGames = [];
 
             //select the required items from the IDs
             List<object> allRequired = [];
@@ -218,7 +236,7 @@ namespace ProjectSpetses.Controllers
                     //if no Match games are left, make a placeholder Match game
                     if (quiz_items.Count > 0)
                     {
-                        Match_item matchItem = new Match_item
+                        var matchItem = new Match_item
                         {
                             Id = 0,
                             Difficulty = difficulty,
@@ -359,7 +377,7 @@ namespace ProjectSpetses.Controllers
             //get the user's completed sections (can be represented by the NotificationsGiven column)
             var completedSections = await _dbContext.Stats
                 .Where(s => s.Id == GetCurrentUserId())
-                .Select(s => s.NotificationsGiven)
+                .Select(s => s.SectionsCompleted)
                 .FirstOrDefaultAsync();
 
             //create the model
@@ -392,7 +410,7 @@ namespace ProjectSpetses.Controllers
             if (!string.IsNullOrEmpty(jsonResults))
             {
                 // make a list of the ansewrs or an empty list if the results is empty
-                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? new List<GameAnswerViewModel>();
+                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? [];
             }
 
             // Add new answers to the results
@@ -431,7 +449,7 @@ namespace ProjectSpetses.Controllers
             if (!string.IsNullOrEmpty(jsonResults))
             {
                 // make a list of the ansewrs or an empty list if the results is empty
-                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? new List<GameAnswerViewModel>();
+                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? [];
             }
 
             // Add new answers to the results
@@ -469,7 +487,7 @@ namespace ProjectSpetses.Controllers
             if (!string.IsNullOrEmpty(jsonResults))
             {
                 // make a list of the ansewrs or an empty list if the results is empty
-                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? new List<GameAnswerViewModel>();
+                oldResults = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults) ?? [];
             }
 
             // Add new answers to the results
@@ -486,7 +504,7 @@ namespace ProjectSpetses.Controllers
 
         public static List<T> ShuffleList<T>(List<T> list)
         {//this shuffles String lists to avoid obvious tests
-            Random random = new Random();
+            Random random = new();
             return list.OrderBy(_ => random.Next()).ToList();
         }
 
@@ -494,7 +512,7 @@ namespace ProjectSpetses.Controllers
         {
             //get the results from the session
             string jsonResults = HttpContext.Session.GetString(gameResultsSession);
-            List<GameAnswerViewModel> results = new List<GameAnswerViewModel>();
+            List<GameAnswerViewModel> results = [];
             results = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults);
 
             //get the failed games

@@ -5,11 +5,6 @@ namespace ProjectSpetses.Other
 {
     public class Hashing
     {
-        public Hashing()
-        {
-
-        }
-
         // Generate a random salt
         public string GenerateSalt()
         {

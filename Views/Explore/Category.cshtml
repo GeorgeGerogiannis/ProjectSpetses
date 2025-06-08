@@ -22,7 +22,6 @@ else
         @if (Model.Content.Page > 1)
         {
             <a class="btn btn-primary"
-               asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
                asp-route-Id="@Model.CategoryId"
@@ -36,7 +35,6 @@ else
         }
 
         <a class="btn btn-primary"
-           asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
            asp-action="@nameof(ExploreController.Section)"
            asp-route-Id="@Model.SectionId">
             Πίσω στις Κατηγορίες
@@ -45,7 +43,6 @@ else
         @if (Model.Content.Page < Model.PageCount)
         {
             <a class="btn btn-primary"
-               asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
                asp-route-Id="@Model.CategoryId"
@@ -56,7 +53,6 @@ else
         else
         {
             <a class="btn btn-primary"
-               asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
                asp-action="@nameof(ExploreController.Section)"
                asp-route-Id="@Model.SectionId"
                asp-route-cId="@Model.CategoryId">
