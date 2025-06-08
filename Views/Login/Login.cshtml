@@ -5,77 +5,75 @@
 <link rel="stylesheet" href="~/css/login_register.css" />
 
 <div class="auth-container">
-    <div class="container">
-        <div class="row justify-content-center align-items-center min-vh-100">
-            <div class="col-md-6 col-lg-5">
-                <div class="auth-card slide-in">
-                    <div class="auth-header">
-                        <div class="auth-icon">
+    <div class="row auth-container2 container">
+        <div class="col-md-6 col-lg-5">
+            <div class="auth-card slide-in">
+                <div class="auth-header">
+                    <div class="auth-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <h2 class="auth-title">Καλώς ήρθατε πίσω!</h2>
+                    <p class="auth-subtitle">Συνδεθείτε για να συνεχίσετε</p>
+                </div>
+
+                <div class="auth-body">
+                    <form asp-action="@nameof(LoginController.Login)" method="post">
+                        @if (ViewData.ModelState.ContainsKey("LoginCredentials"))
+                        {
+                            <div class="alert alert-danger custom-alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                @ViewData.ModelState["LoginCredentials"].Errors.First().ErrorMessage
+                            </div>
+                        }
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                Όνομα Χρήστη
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" class="form-control custom-input" asp-for="Username" placeholder="Εισάγετε το όνομα χρήστη σας" />
+                            </div>
+                            <span asp-validation-for="Username" class="text-danger validation-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Κωδικός Πρόσβασης
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="password" class="form-control custom-input" asp-for="Password" placeholder="Εισάγετε τον κωδικό σας" />
+                                <div class="input-focus"></div>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger validation-error"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary auth-btn">
                             <i class="fas fa-sign-in-alt"></i>
-                        </div>
-                        <h2 class="auth-title">Καλώς ήρθατε πίσω!</h2>
-                        <p class="auth-subtitle">Συνδεθείτε για να συνεχίσετε</p>
+                            Σύνδεση
+                        </button>
+                    </form>
+
+                    <div class="auth-divider">
+                        <span>ή</span>
                     </div>
 
-                    <div class="auth-body">
-                        <form asp-action="@nameof(LoginController.Login)" method="post">
-                            @if (ViewData.ModelState.ContainsKey("LoginCredentials"))
-                            {
-                                <div class="alert alert-danger custom-alert">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    @ViewData.ModelState["LoginCredentials"].Errors.First().ErrorMessage
-                                </div>
-                            }
-
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-user"></i>
-                                    Όνομα Χρήστη
-                                </label>
-                                <div class="input-wrapper">
-                                    <input type="text" class="form-control custom-input" asp-for="Username" placeholder="Εισάγετε το όνομα χρήστη σας" />
-                                </div>
-                                <span asp-validation-for="Username" class="text-danger validation-error"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-lock"></i>
-                                    Κωδικός Πρόσβασης
-                                </label>
-                                <div class="input-wrapper">
-                                    <input type="password" class="form-control custom-input" asp-for="Password" placeholder="Εισάγετε τον κωδικό σας" />
-                                    <div class="input-focus"></div>
-                                </div>
-                                <span asp-validation-for="Password" class="text-danger validation-error"></span>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary auth-btn">
-                                <i class="fas fa-sign-in-alt"></i>
-                                Σύνδεση
-                            </button>
-                        </form>
-
-                        <div class="auth-divider">
-                            <span>ή</span>
-                        </div>
-
-                        <div class="auth-footer">
-                            <p>Δεν έχετε λογαριασμό;</p>
-                            <a asp-action="@nameof(LoginController.Register)" class="btn btn-outline-primary auth-link">
-                                <i class="fas fa-user-plus"></i>
-                                Δημιουργία Λογαριασμού
-                            </a>
-                        </div>
+                    <div class="auth-footer">
+                        <p>Δεν έχετε λογαριασμό;</p>
+                        <a asp-action="@nameof(LoginController.Register)" class="btn btn-outline-primary auth-link">
+                            <i class="fas fa-user-plus"></i>
+                            Δημιουργία Λογαριασμού
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <div class="back-to-home">
-                    <a asp-controller="Home" asp-action="Index" class="back-link">
-                        <i class="fas fa-arrow-left"></i>
-                        Επιστροφή στην Αρχική
-                    </a>
-                </div>
+            <div class="back-to-home">
+                <a asp-controller="Home" asp-action="Index" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Επιστροφή στην Αρχική
+                </a>
             </div>
         </div>
     </div>

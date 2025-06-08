@@ -9,6 +9,12 @@
     justify-content: center;
 }
 
+.auth-container2 {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
 .auth-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
