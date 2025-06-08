@@ -16,7 +16,7 @@ namespace ProjectSpetses.Controllers
         private const string selectedGamesSession = "SelectedGames";
         private const string gameResultsSession = "GameResults";
 
-        public async Task<IActionResult> StartGameConverter(int duration, string sections, 
+        public async Task<IActionResult> StartGameConverter(int duration, string sections, string difficulty,
             string? requiredQuiz, string? requiredBlank, string? requiredMatch)
         {
             //this function converts the parameters from the html to their inteded types
@@ -34,8 +34,16 @@ namespace ProjectSpetses.Controllers
             var quizList = string.IsNullOrWhiteSpace(requiredQuiz) ? null : ParseList(requiredQuiz);
             var blankList = string.IsNullOrWhiteSpace(requiredBlank) ? null : ParseList(requiredBlank);
             var matchList = string.IsNullOrWhiteSpace(requiredMatch) ? null : ParseList(requiredMatch);
-          
-            return await StartGame(duration, sectionList, quizList, blankList, matchList);
+
+            return RedirectToAction(nameof(StartGame), new
+            {
+                duration,
+                sections = sectionList,
+                difficulty,
+                requiredQuiz = quizList,
+                requiredBlank = blankList,
+                requiredMatch = matchList
+            });
 
             //the following code is an example on how to call the StartGameConverter Method in HTML
             /*
@@ -49,7 +57,7 @@ namespace ProjectSpetses.Controllers
              */
         }
 
-        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
+        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, string difficulty, List<ushort>? requiredQuiz = null,
             List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
         {
             //this might need "await" on every call
@@ -73,7 +81,7 @@ namespace ProjectSpetses.Controllers
             var selectedGames = new List<object>();
 
             //select the required items from the IDs
-            List<object> allRequired = new List<object>();
+            List<object> allRequired = [];
             if (requiredQuiz != null)
             {
                 foreach (var id in requiredQuiz)
@@ -213,6 +221,7 @@ namespace ProjectSpetses.Controllers
                         Match_item matchItem = new Match_item
                         {
                             Id = 0,
+                            Difficulty = difficulty,
                             Image = "placeholder.png",
                             Solution = "Default solution",
                             SectionId = 0
@@ -233,7 +242,7 @@ namespace ProjectSpetses.Controllers
             HttpContext.Session.SetString(gameResultsSession, "");
 
             //HttpContext.Session.SetString("Test", "I work");
-            return await NextGame();
+            return RedirectToAction(nameof(NextGame));
         }
 
         [HttpGet]
@@ -244,7 +253,7 @@ namespace ProjectSpetses.Controllers
 
             string json = HttpContext.Session.GetString(selectedGamesSession);
             var deserializedGames = JsonSerializer.Deserialize<List<GameWrapper>>(json);
-            List<object> selectedGames = new List<object>();
+            List<object> selectedGames = [];
             foreach (var game in deserializedGames)
             {
                 switch (game.Type)
@@ -271,7 +280,7 @@ namespace ProjectSpetses.Controllers
             //redirect to the game pages
             if (selectedGames.Count == 0)
             {
-                return FinishGames();
+                return RedirectToAction(nameof(FinishGames));
             }
             else if (selectedGames[0] is Quiz_item quizItem)
             {
@@ -303,7 +312,7 @@ namespace ProjectSpetses.Controllers
             {
                 //pointer problems? (renfrences lists)
                 List<object> noMatchGames = selectedGames.ToList();
-                List<Match_item> allMatches = new List<Match_item>();
+                List<Match_item> allMatches = [];
                 foreach (var item in selectedGames)
                 {
                     if (item is Match_item match)
@@ -369,15 +378,15 @@ namespace ProjectSpetses.Controllers
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
             var quiz_item = await _dbContext.Quiz_items.FirstOrDefaultAsync(q => q.Id == id);
             quiz_item.Answers = ShuffleList(quiz_item.Answers);
-            return View(quiz_item);
 
+            return View(quiz_item);
         }
 
         [HttpPost]
         public async Task<IActionResult> SubmitQuiz(GameSubmissionViewModel submission)
         {
             //save the quiz results in session
-            List<GameAnswerViewModel> oldResults = new();
+            List<GameAnswerViewModel> oldResults = [];
 
             string jsonResults = HttpContext.Session.GetString(gameResultsSession);
             if (!string.IsNullOrEmpty(jsonResults))
@@ -395,7 +404,7 @@ namespace ProjectSpetses.Controllers
             // Save updated results back to session
             HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
 
-            return await NextGame();
+            return RedirectToAction(nameof(NextGame));
         }
 
         public async Task<IActionResult> WordMatch(List<ushort> ids)
@@ -404,7 +413,7 @@ namespace ProjectSpetses.Controllers
                 .Where(m => ids.Contains(m.Id))
                 .ToListAsync();
             //get the drop list for the html
-            List<String> dropList = new List<String>();
+            List<string> dropList = [];
             foreach (var item in match_items)
             {
                 dropList.Add(item.Solution);
@@ -416,7 +425,7 @@ namespace ProjectSpetses.Controllers
         public async Task<IActionResult> SubmitWordMatch(GameSubmissionViewModel submission)
         {
             //save the word Match results in session
-            List<GameAnswerViewModel> oldResults = new();
+            List<GameAnswerViewModel> oldResults = [];
 
             string jsonResults = HttpContext.Session.GetString(gameResultsSession);
             if (!string.IsNullOrEmpty(jsonResults))
@@ -437,7 +446,7 @@ namespace ProjectSpetses.Controllers
             // Save updated results back to session
             HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
 
-            return await NextGame();
+            return RedirectToAction(nameof(NextGame));
         }
         public async Task<IActionResult> FillBlank(ushort id)
         {
@@ -445,6 +454,7 @@ namespace ProjectSpetses.Controllers
             //this shuffles the answers on the quiz, in case it isn't already done in the DB
             var blank_item = await _dbContext.Blank_items.FirstOrDefaultAsync(b => b.Id == id);
             blank_item.Answers = ShuffleList(blank_item.Answers);
+
             return View(blank_item);
         }
 
@@ -453,7 +463,7 @@ namespace ProjectSpetses.Controllers
         {
             //You COULD just use SubmitQuiz, it's the same thing...
             //save the blank results in session
-            List<GameAnswerViewModel> oldResults = new();
+            List<GameAnswerViewModel> oldResults = [];
 
             string jsonResults = HttpContext.Session.GetString(gameResultsSession);
             if (!string.IsNullOrEmpty(jsonResults))
@@ -471,7 +481,7 @@ namespace ProjectSpetses.Controllers
             // Save updated results back to session
             HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
 
-            return await NextGame();
+            return RedirectToAction(nameof(NextGame));
         }
 
         public static List<T> ShuffleList<T>(List<T> list)
@@ -480,11 +490,6 @@ namespace ProjectSpetses.Controllers
             return list.OrderBy(_ => random.Next()).ToList();
         }
 
-        //gets the user's id from session
-        private Guid GetCurrentUserId()
-        {
-            var currentUserId = User.FindFirst("User_id")?.Value;
-            return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
         public IActionResult FinishGames()
         {
             //get the results from the session
@@ -497,9 +502,14 @@ namespace ProjectSpetses.Controllers
                 .Where(r => r.SelectedValue == "False")
                 .ToList();
 
+            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
+        }
 
-
-            return RedirectToAction(nameof(Index), "Home");
+        //gets the user's id from session
+        private Guid GetCurrentUserId()
+        {
+            var currentUserId = User.FindFirst("User_id")?.Value;
+            return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
         }
     }
 }
