@@ -69,7 +69,12 @@
             <section class="palette">
                 @foreach (var item in matchItems)
                 {
-                    <img src="@item.Image" alt="/images/placeholder.png" id="@item.Id" draggable="true" ondragstart="dragstartHandler(event)" data-match="@item.Id Solution">
+                    <img src="@item.Image"
+						 alt="/images/placeholder.png"
+						 id="@item.Id"
+						 draggable="true"
+						 ondragstart="dragstartHandler(event)"
+						 data-match="@item.Id-Solution">
                 }
             </section>
         </div>
@@ -83,14 +88,22 @@
                     {
                         if (item.Solution == option)
                         {
-                            <div class="dropzone" id="@item.Id Solution" ondragover="dragoverHandler(event)"
-                             ondrop="dropHandler(event)" data-accept="@item.Id">
-                                <span class="droptext" id="@item.Id Solution Span">@item.Solution</span>
+                            <div class="dropzone" 
+                                id="@item.Id-Solution" 
+                                ondragover="dragoverHandler(event)"
+                                ondrop="dropHandler(event)" 
+                                data-accept="@item.Id">
+                                    <span class="droptext" 
+                                        id="@item.Id-Solution-Span">
+                                            @item.Solution
+                                    </span>
+                                    @{
+                                        int optionIndex = dropList.IndexOf(option);
+                                    }
+                                    <input type="hidden" name="Answers[@optionIndex].GameType" value="WordMatch"/>
+                                    <input type="hidden" name="Answers[@optionIndex].QuestionId" value=""/>
+                                    <input type="hidden" name="Answers[@optionIndex].SelectedValue" value=""/>
                             </div>
-                            int optionIndex = dropList.IndexOf(option);
-							<input type="hidden" name="Answers[@optionIndex].GameType" value="Quiz" />
-                            <input type="hidden" name="Answers[@optionIndex].QuestionId" value="" />
-                            <input type="hidden" name="Answers[@optionIndex].SelectedValue" value="" />
                         }
                     }
                 }
@@ -150,7 +163,7 @@
             inputQuestionId.value = draggedEl.id;
             //Set whether its right or false into the Selected Value
             const inputSelected = dropzone.querySelector('input[type="hidden"][name$=".SelectedValue"]');
-            if draggedEl.getAttribute('data-match') === dropzone.id) {
+            if (draggedEl.getAttribute('data-match') === dropzone.id) {
                 inputSelected.value = "True";
             } else {
                 inputSelected.value = "False";

@@ -6,8 +6,10 @@
         Testing - 
         <a 
            asp-controller="Games" 
-           asp-action="@nameof(GamesController.Testing)">
-           Testing fun
+           asp-action="@nameof(GamesController.StartGameConverter)"
+           asp-route-duration="10"
+		   asp-route-sections="1,2,3">
+           Testing initiation
        </a>
     </div>
     <div>
@@ -16,9 +18,4 @@
     <div>
         Testing - <a asp-area="" asp-controller="Games" asp-action="FillBlank">Fill Blanks</a>
     </div>
-    <form asp-controller="Games" asp-action="Tester" method="get">
-        <input type="hidden" name="gameType" value="Quiz" />
-        <input type="hidden" name="id" value="5" />
-        <button type="submit">Start Quiz 5</button>
-    </form>
 </footer>

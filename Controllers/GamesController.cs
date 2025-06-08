@@ -12,55 +12,41 @@ namespace ProjectSpetses.Controllers
 {
     public class GamesController(ApplicationDbContext dbContext) : Controller
     {
-        //testing
-        // Add this to your GamesController
-
-        //[HttpGet]
-        //public IActionResult Tester(string gameType, ushort? id)
-        //{
-        //    if (string.IsNullOrEmpty(gameType) || id == null)
-        //    {
-        //        // Optionally, redirect to an error or index page
-        //        return RedirectToAction(nameof(Index));
-        //        return RedirectToAction(nameof(HomeController.Index),
-        //            nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
-        //    }
-
-        //    switch (gameType)
-        //    {
-        //        case "Quiz":
-        //            // You may need to load the Quiz_item from the database if your Quiz action expects the full object
-        //            var quizItem = _dbContext.Quiz_items.FirstOrDefault(q => q.Id == id);
-        //            if (quizItem != null)
-        //                return RedirectToAction(nameof(Quiz), new { id = quizItem.Id });
-        //            break;
-        //        case "FillBlank":
-        //            var blankItem = _dbContext.Blank_items.FirstOrDefault(b => b.Id == id);
-        //            if (blankItem != null)
-        //                return RedirectToAction(nameof(FillBlank), new { id = blankItem.Id });
-        //            break;
-        //        case "WordMatch":
-        //            var matchItem = _dbContext.Match_items.FirstOrDefault(m => m.Id == id);
-        //            if (matchItem != null)
-        //                return RedirectToAction(nameof(WordMatch), new { id = matchItem.Id });
-        //            break;
-        //    }
-
-        //    // If not found or invalid type, redirect to index
-        //    return RedirectToAction(nameof(Index));
-        //}
-        //testing
-
-        //get access to the database
         private readonly ApplicationDbContext _dbContext = dbContext;
         private const string selectedGamesSession = "SelectedGames";
         private const string gameResultsSession = "GameResults";
 
-        public async Task<IActionResult> Testing()
+        public async Task<IActionResult> StartGameConverter(int duration, string sections, 
+            string? requiredQuiz, string? requiredBlank, string? requiredMatch)
         {
-            var page = await StartGame(5,
-                new List<ushort> { 1, 2, 3 });
-            return page;
+            //this function converts the parameters from the html to their inteded types
+            static List<ushort> ParseList(string? csv) =>
+                string.IsNullOrWhiteSpace(csv)
+                    ? new()
+                    : csv.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                         .Select(s => ushort.TryParse(s.Trim(), out var v) ? v : (ushort?)null)
+                         .Where(v => v.HasValue)
+                         .Select(v => v.Value)
+                         .ToList();
+            //parse the sections from the string to a List<ushort>
+            var sectionList = ParseList(sections);
+            //same but also makes them null if they are empty
+            var quizList = string.IsNullOrWhiteSpace(requiredQuiz) ? null : ParseList(requiredQuiz);
+            var blankList = string.IsNullOrWhiteSpace(requiredBlank) ? null : ParseList(requiredBlank);
+            var matchList = string.IsNullOrWhiteSpace(requiredMatch) ? null : ParseList(requiredMatch);
+          
+            return await StartGame(duration, sectionList, quizList, blankList, matchList);
+
+            //the following code is an example on how to call the StartGameConverter Method in HTML
+            /*
+                <a 
+                    asp-controller="Games" 
+                    asp-action="@nameof(GamesController.StartGameConverter)"
+                    asp-route-duration="10"
+	                   asp-route-sections="1,2,3">
+                    Testing initiation
+                </a>
+             */
         }
 
         public async Task<IActionResult> StartGame(int duration, List<ushort> sections, List<ushort>? requiredQuiz = null,
@@ -417,7 +403,7 @@ namespace ProjectSpetses.Controllers
             }
 
             //testing
-            Debug.WriteLine($"Answers: {JsonSerializer.Serialize(submission.Answers)}");
+            Debug.WriteLine($"&&&&Answers: {JsonSerializer.Serialize(submission.Answers)}");
 
             // Save updated results back to session
             HttpContext.Session.SetString(gameResultsSession, JsonSerializer.Serialize(oldResults));
@@ -467,6 +453,18 @@ namespace ProjectSpetses.Controllers
 
         public IActionResult FinishGames()
         {
+            //get the results from the session
+            string jsonResults = HttpContext.Session.GetString(gameResultsSession);
+            List<GameAnswerViewModel> results = new List<GameAnswerViewModel>();
+            results = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults);
+
+            //get the failed games
+            List<GameAnswerViewModel> failedGames = results
+                .Where(r => r.SelectedValue == "False")
+                .ToList();
+
+
+
             return RedirectToAction(nameof(Index), "Home");
         }
     }
