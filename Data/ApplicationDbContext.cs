@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
 
 namespace ProjectSpetses.Data
@@ -85,6 +86,19 @@ namespace ProjectSpetses.Data
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                     v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
+
+            modelBuilder.Entity<Stats>()
+                .Property(s => s.CorrectAnswers)
+                .HasConversion(
+                    v => v == null ? null : JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => v == null ? new List<StatAnswerViewModel>() : JsonSerializer.Deserialize<List<StatAnswerViewModel>>(v, (JsonSerializerOptions?)null)!);
+
+            modelBuilder.Entity<Stats>()
+                .Property(s => s.WrongAnswers)
+                .HasConversion(
+                    v => v == null ? null : JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => v == null ? new List<StatAnswerViewModel>() : JsonSerializer.Deserialize<List<StatAnswerViewModel>>(v, (JsonSerializerOptions?)null)!);
+
 
             base.OnModelCreating(modelBuilder);
         }

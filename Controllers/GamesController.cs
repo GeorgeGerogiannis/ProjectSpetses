@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjectSpetses.Data;
 using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
@@ -490,17 +491,125 @@ namespace ProjectSpetses.Controllers
             return list.OrderBy(_ => random.Next()).ToList();
         }
 
-        public IActionResult FinishGames()
+        public async Task<IActionResult> FinishGames()
         {
+            //get the user's id from session
+            Guid userId = GetCurrentUserId();
+            //get the user's stats from the database
+            Stats userStats = _dbContext.Stats.FirstOrDefault(s => s.Id == userId);
+
+            //Load all items from the database
+            List<Blank_item> blank_items = await _dbContext.Blank_items.ToListAsync();
+            List<Quiz_item> quiz_items = await _dbContext.Quiz_items.ToListAsync();
+            List<Match_item> match_items = await _dbContext.Match_items.ToListAsync();
+
             //get the results from the session
             string jsonResults = HttpContext.Session.GetString(gameResultsSession);
             List<GameAnswerViewModel> results = new List<GameAnswerViewModel>();
             results = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(jsonResults);
-
+            //get the correct games
+            List<GameAnswerViewModel> correctAnswers = results
+                .Where(r => r.SelectedValue == "True")
+                .ToList();
             //get the failed games
-            List<GameAnswerViewModel> failedGames = results
+            List<GameAnswerViewModel> wrongAnswers = results
                 .Where(r => r.SelectedValue == "False")
                 .ToList();
+            
+            //append the correct games to the user's stats
+            List<StatAnswerViewModel> correctAnswersList = [];
+            foreach (var game in correctAnswers)
+            {//all the names being hardcoded is scary, but *shrug*
+                if (game.GameType == "Quiz")
+                {
+                    ushort sectionId = quiz_items.FirstOrDefault(q => q.Id == game.QuestionId).SectionId;
+                    correctAnswersList.Add(new StatAnswerViewModel
+                    {
+                        SectionId = sectionId,
+                        GameType = game.GameType,
+                        GameId = (ushort)game.QuestionId
+                    });
+                }
+                else if (game.GameType == "FillBlank")
+                {
+                    ushort sectionId = blank_items.FirstOrDefault(b => b.Id == game.QuestionId).SectionId;
+                    correctAnswersList.Add(new StatAnswerViewModel
+                    {
+                        SectionId = sectionId,
+                        GameType = game.GameType,
+                        GameId = (ushort)game.QuestionId
+                    });
+                }
+                else if (game.GameType == "WordMatch")
+                {
+                    ushort sectionId = match_items.FirstOrDefault(m => m.Id == game.QuestionId).SectionId;
+                    correctAnswersList.Add(new StatAnswerViewModel
+                    {
+                        SectionId = sectionId,
+                        GameType = game.GameType,
+                        GameId = (ushort)game.QuestionId
+                    });
+                }
+            }
+            //add the correct answers to the user's stats
+            if (userStats.CorrectAnswers == null)
+            {
+                userStats.CorrectAnswers = correctAnswersList;
+            }
+            else
+            {
+                userStats.CorrectAnswers.AddRange(correctAnswersList);
+            }
+
+            //append the failed games to the user's stats
+            List<StatAnswerViewModel> wrongAnswersList = [];
+            foreach (var game in wrongAnswers)
+            {//all the names being hardcoded is scary, but *shrug*
+                if (game.GameType == "Quiz")
+                {
+                    ushort sectionId = quiz_items.FirstOrDefault(q => q.Id == game.QuestionId).SectionId;
+                    wrongAnswersList.Add(new StatAnswerViewModel
+                    {
+                        SectionId = sectionId,
+                        GameType = game.GameType,
+                        GameId = (ushort)game.QuestionId
+                    });
+                }
+                else if (game.GameType == "FillBlank")
+                {
+                    ushort sectionId = blank_items.FirstOrDefault(b => b.Id == game.QuestionId).SectionId;
+                    wrongAnswersList.Add(new StatAnswerViewModel
+                    {
+                        SectionId = sectionId,
+                        GameType = game.GameType,
+                        GameId = (ushort)game.QuestionId
+                    });
+                }
+                else if (game.GameType == "WordMatch")
+                {
+                    ushort sectionId = match_items.FirstOrDefault(m => m.Id == game.QuestionId).SectionId;
+                    wrongAnswersList.Add(new StatAnswerViewModel
+                    {
+                        SectionId = sectionId,
+                        GameType = game.GameType,
+                        GameId = (ushort)game.QuestionId
+                    });
+                }
+            }
+            //add the wrong answers to the user's stats
+            if (userStats.WrongAnswers == null)
+            {
+                userStats.WrongAnswers = wrongAnswersList;
+            }
+            else
+            {
+                userStats.WrongAnswers.AddRange(wrongAnswersList);
+            }
+            //should wrong answers be removable?
+
+            //update the user's stats in the database
+            _dbContext.Stats.Update(userStats);
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(HomeController.Index), nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
         }
