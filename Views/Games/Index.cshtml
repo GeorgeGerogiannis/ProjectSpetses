@@ -77,3 +77,21 @@
 
     }
 </div>
+<footer class="border-top footer text-muted">
+    <div class="container">
+        Testing - 
+        <a 
+           asp-controller="Games" 
+           asp-action="@nameof(GamesController.StartGameConverter)"
+           asp-route-duration="10"
+		   asp-route-sections="1,2,3">
+           Testing initiation
+       </a>
+    </div>
+    <div>
+        Testing - <a asp-area="" asp-controller="Games" asp-action="WordMatch">WordMatch</a>
+    </div>
+    <div>
+        Testing - <a asp-area="" asp-controller="Games" asp-action="FillBlank">Fill Blanks</a>
+    </div>
+</footer>
