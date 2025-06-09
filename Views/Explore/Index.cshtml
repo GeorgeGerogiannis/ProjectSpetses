@@ -43,8 +43,7 @@ else
             }
             else
             {
-                <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-                   asp-action="@nameof(ExploreController.Section)"
+                <a asp-action="@nameof(ExploreController.Section)"
                    asp-route-Id="@exploreSection.Id"
                    class="section-card-link @(Model.CompletedCategories[i] == Model.CategoryCount[i] ? "completed" : "")">
                     <div class="section-card @(Model.CompletedCategories[i] == Model.CategoryCount[i] ? "completed" : "")">

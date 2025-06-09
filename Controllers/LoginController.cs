@@ -108,7 +108,7 @@ namespace ProjectSpetses.Controllers
                 Id = userId,
                 TotalPoints = 0,
                 CategoriesRead = [],
-                NotificationsGiven = [],
+                SectionsCompleted = [],
                 CreatedAt = DateTime.UtcNow,
                 CorrectAnswers = [],
                 WrongAnswers = []

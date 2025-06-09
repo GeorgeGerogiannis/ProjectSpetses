@@ -126,12 +126,12 @@ namespace ProjectSpetses.Controllers
 
             var notify = false;
 
-            if (!completed.Contains(false) && !stats.NotificationsGiven.Contains(Id))
+            if (!completed.Contains(false) && !stats.SectionsCompleted.Contains(Id))
             {
                 //if the user has completed all categories in this section and has not been notified yet, give them a notification
                 //and consider the section completed and the user ready to play the section's games
-                var notifications = _dbContext.Update(stats).Entity.NotificationsGiven;
-                notifications.Add(Id);
+                var sectionsCompleted = _dbContext.Update(stats).Entity.SectionsCompleted;
+                sectionsCompleted.Add(Id);
                 await _dbContext.SaveChangesAsync();
                 notify = true;
             }
@@ -159,6 +159,21 @@ namespace ProjectSpetses.Controllers
                 return NotFound("Something Went Wrong");
             }
 
+            //get the current user stats
+            var stats = await _dbContext.Stats
+                .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+
+            var pointsRequired = await _dbContext.Sections
+                .Where(s => s.Id == sectionId)
+                .Select(s => s.PointsRequired)
+                .FirstOrDefaultAsync();
+
+            if (pointsRequired > stats.TotalPoints)
+            {
+                //if the user does not have enough points, redirect to the index page
+                return RedirectToAction(nameof(Index));
+            }
+
             //get category name
             var category = await _dbContext.Categories
                 .FirstOrDefaultAsync(c => c.SectionIndex == Id && c.SectionId == sectionId);
@@ -178,9 +193,7 @@ namespace ProjectSpetses.Controllers
                 .Where(c => c.CategoryId == Id)
                 .CountAsync();
 
-            //get the current user stats
-            var stats = await _dbContext.Stats
-                .FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+            
 
             //add the last read content to the user stats
             stats.LastRead = $"{sectionId}:{Id}:{page}";

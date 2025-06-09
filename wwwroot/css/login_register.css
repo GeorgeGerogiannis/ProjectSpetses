@@ -1,11 +1,247 @@
-﻿.title {
-    font-size: 32px;
-    font-weight: 700;
-    color: white;
+﻿body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.auth-container {
+    position: relative;
     display: flex;
+    align-items: center;
     justify-content: center;
 }
 
-.form-label {
+.auth-container2 {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+}
+
+.auth-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+}
+
+.auth-icon {
+    font-size: 48px;
+}
+
+.auth-title {
+    font-size: 29px;
+    font-weight: 600;
+    position: relative;
+}
+
+.auth-subtitle {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.auth-body {
+    padding: 40px 30px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-label i {
+    margin-right: 10px;
+    color: #667eea;
+    width: 16px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.custom-input {
+    padding: 15px 20px;
+    border: 2px solid #e1e5e9;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: #fff;
+    color: #333;
+}
+
+.custom-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.custom-input::placeholder {
+    color: #aaa;
+    transition: all 0.3s ease;
+}
+
+.custom-input:focus::placeholder {
+    opacity: 0.7;
+    transform: translateX(5px);
+}
+
+.input-wrapper.focused {
+    width: 100%;
+}
+
+.validation-error {
+    font-size: 14px;
+    display: block;
+    color: #dc3545;
+}
+
+.custom-alert {
+    border-radius: 12px;
+    padding: 15px 20px;
+    background: #f8d7da;
+    color: #721c24;
+    display: flex;
+    align-items: center;
+}
+
+.custom-alert i {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 12px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(45deg, #5a67d8, #6b46c1);
+}
+
+.auth-btn i {
+    margin-right: 10px;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 25px 0;
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e1e5e9;
+}
+
+.auth-divider span {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0 15px;
+    color: #666;
+    font-size: 14px;
+    position: relative;
+}
+
+.auth-footer {
+    text-align: center;
+}
+
+.auth-footer p {
+    color: #666;
+    font-size: 16px;
+}
+
+.auth-link {
+    padding: 12px 25px;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    color: #667eea;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    align-items: center;
+    background: transparent;
+}
+
+.auth-link:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.auth-link i {
+    margin-right: 10px;
+}
+
+.back-to-home {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.back-link:hover {
+    color: white;
+    transform: translateX(-5px);
+}
+
+.back-link i {
+    margin-right: 10px;
+}
+
+.slide-in {
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }

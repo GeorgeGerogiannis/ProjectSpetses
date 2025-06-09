@@ -19,8 +19,7 @@ else
         @for (int i = 0; i < Model.Categories.Count; i++)
         {
             var category = Model.Categories[i];
-            <a asp-controller="@nameof(ExploreController)[..nameof(ExploreController).LastIndexOf("Controller")]"
-               asp-action="@nameof(ExploreController.Category)"
+            <a asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
                asp-route-Id="@category.SectionIndex"
                asp-route-page="1"
