@@ -8,7 +8,7 @@ namespace ProjectSpetses.Models.Entities
         public required Guid Id { get; set; }
         public string? LastRead { get; set; } //format: "{sectionId}:{categoryId}:{contentPage}"
         public required uint TotalPoints { get; set; }
-        public required List<string> CategoriesRead { get; set; } //format: "{sectionId}:{categoryId}"
+        public required List<string> CategoriesCompleted { get; set; } //format: "{sectionId}:{categoryId}"
         public required List<ushort> SectionsCompleted { get; set; }
         public required DateTime CreatedAt { get; set; }
         public required List<StatAnswerViewModel> CorrectAnswers { get; set; } //serialised StatsAnswersViewModel

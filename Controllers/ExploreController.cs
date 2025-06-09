@@ -39,11 +39,14 @@ namespace ProjectSpetses.Controllers
                     .CountAsync();
 
                 //get the number of completed categories for the current user
-                var categoriesRead = _dbContext.Update(_dbContext.Stats.FirstOrDefault(s => s.Id == GetCurrentUserId())).Entity.CategoriesRead.Count;
+                var userStats = await _dbContext.Stats.FirstOrDefaultAsync(s => s.Id == GetCurrentUserId());
+                var categoriesRead = userStats.CategoriesCompleted
+                    .Where(entry => entry.StartsWith($"{section.Id}:"))
+                    .ToList();
 
                 //add both in lists to use them for showing user progression
                 sectionCategories.Add((ushort)categoryCount);
-                completedSections.Add((ushort)categoriesRead);
+                completedSections.Add((ushort)categoriesRead.Count);
             }
 
             //create the model
@@ -88,7 +91,7 @@ namespace ProjectSpetses.Controllers
             }
 
             //get the completed categories
-            var categoriesRead = _dbContext.Update(stats).Entity.CategoriesRead;
+            var categoriesRead = _dbContext.Update(stats).Entity.CategoriesCompleted;
 
             if (cId != 0)
             {
@@ -150,8 +153,8 @@ namespace ProjectSpetses.Controllers
         }
 
         [HttpGet]
-        [Route("Explore/Section/{sectionId}/Category/{Id}/Page/{page}")]
-        public async Task<IActionResult> Category(ushort sectionId, ushort Id, ushort page)
+        [Route("Explore/Section/{sectionId}/Category/{sectionIndex}/Page/{page}")]
+        public async Task<IActionResult> Category(ushort sectionId, ushort sectionIndex, ushort page)
         {
             //check if user is authenticated
             if (!User.Identity.IsAuthenticated)
@@ -176,7 +179,7 @@ namespace ProjectSpetses.Controllers
 
             //get category name
             var category = await _dbContext.Categories
-                .FirstOrDefaultAsync(c => c.SectionIndex == Id && c.SectionId == sectionId);
+                .FirstOrDefaultAsync(c => c.SectionIndex == sectionIndex && c.SectionId == sectionId);
 
             //check if the category exists
             if (category == null)
@@ -190,20 +193,18 @@ namespace ProjectSpetses.Controllers
 
             //get the category page count
             var pageCount = (ushort) await _dbContext.Content
-                .Where(c => c.CategoryId == Id)
+                .Where(c => c.CategoryId == category.Id)
                 .CountAsync();
 
-            
-
             //add the last read content to the user stats
-            stats.LastRead = $"{sectionId}:{Id}:{page}";
+            stats.LastRead = $"{sectionId}:{sectionIndex}:{page}";
             await _dbContext.SaveChangesAsync();
 
             //create the model
             var model = new CategoryViewModel
             {
                 SectionId = sectionId,
-                CategoryId = Id,
+                CategoryId = sectionIndex,
                 CategoryName = category.Name,
                 Content = content,
                 PageCount = pageCount,

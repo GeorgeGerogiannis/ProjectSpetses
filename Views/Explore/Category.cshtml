@@ -24,7 +24,7 @@ else
             <a class="btn btn-primary"
                asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
-               asp-route-Id="@Model.CategoryId"
+               asp-route-sectionIndex="@Model.CategoryId"
                asp-route-page="@(Model.Content.Page - 1)">
                 @Html.Raw("<- Προηγούμενη Σελίδα")
             </a>
@@ -45,7 +45,7 @@ else
             <a class="btn btn-primary"
                asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
-               asp-route-Id="@Model.CategoryId"
+               asp-route-sectionIndex="@Model.CategoryId"
                asp-route-page="@(Model.Content.Page + 1)">
                 @Html.Raw("Επόμενη Σελίδα ->")
             </a>

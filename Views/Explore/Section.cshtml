@@ -21,7 +21,7 @@ else
             var category = Model.Categories[i];
             <a asp-action="@nameof(ExploreController.Category)"
                asp-route-sectionId="@Model.SectionId"
-               asp-route-Id="@category.SectionIndex"
+               asp-route-sectionIndex="@category.SectionIndex"
                asp-route-page="1"
                class="category-card-link @(Model.Completed[i] ? "completed" : "")">
                 <div class="category-card @(Model.Completed[i] ? "completed" : "")">

@@ -31,7 +31,7 @@ namespace ProjectSpetses.Controllers
                 .Select(s => new
                 {
                     s.TotalPoints,
-                    s.CategoriesRead,
+                    s.CategoriesCompleted,
                     s.SectionsCompleted,
                     s.CreatedAt,
                     s.WrongAnswers,
@@ -45,7 +45,7 @@ namespace ProjectSpetses.Controllers
                 Username = username,
                 TotalPoints = stats.TotalPoints,
                 SectionsCompleted = (ushort)stats.SectionsCompleted.Count,
-                CategoriesCompleted = (ushort)stats.CategoriesRead.Count,
+                CategoriesCompleted = (ushort)stats.CategoriesCompleted.Count,
                 CreatedAt = stats.CreatedAt,
                 WrongAnswers = (uint)stats.WrongAnswers.Count,
                 CorrectAnswers = (uint)stats.CorrectAnswers.Count,
