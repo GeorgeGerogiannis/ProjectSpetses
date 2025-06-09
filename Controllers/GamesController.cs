@@ -170,6 +170,7 @@ namespace ProjectSpetses.Controllers
             List<char> gameNames = ['Q', 'B', 'M'];
 
             //select random games
+            Random random = new Random();
             for (int i = 0; i < duration; i++)
             {
                 //removes game types that have no items left
@@ -184,21 +185,21 @@ namespace ProjectSpetses.Controllers
                     break;
 
                 //select a random game type
-                int gameType = new Random().Next(gameNames.Count);
+                char gameType = gameNames[random.Next(gameNames.Count)];
                 //fill the rest of the selected Games
-                if (gameType == 0)
+                if (gameType == 'Q')
                 {
                     int randomIndex = new Random().Next(quiz_items.Count);
                     selectedGames.Add(quiz_items[randomIndex]);
                     quiz_items.RemoveAt(randomIndex);
                 }
-                else if (gameType == 1)
+                else if (gameType == 'B')
                 {
                     int randomIndex = new Random().Next(blank_items.Count);
                     selectedGames.Add(blank_items[randomIndex]);
                     blank_items.RemoveAt(randomIndex);
                 }
-                else if (gameType == 2)
+                else if (gameType == 'M')
                 {
                     int randomIndex = new Random().Next(match_items.Count);
                     selectedGames.Add(match_items[randomIndex]);
@@ -618,7 +619,7 @@ namespace ProjectSpetses.Controllers
             _dbContext.Stats.Update(userStats);
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]);
+            return RedirectToAction(nameof(Results), new { answers = results });
         }
 
         //gets the user's id from session
@@ -626,6 +627,15 @@ namespace ProjectSpetses.Controllers
         {
             var currentUserId = User.FindFirst("User_id")?.Value;
             return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
+        }
+        public async Task<IActionResult> Results(List<GameAnswerViewModel> answers)
+        {
+            GameSubmissionViewModel model = new GameSubmissionViewModel
+            {
+                Answers = answers
+            };
+
+            return View(model);
         }
     }
 }
