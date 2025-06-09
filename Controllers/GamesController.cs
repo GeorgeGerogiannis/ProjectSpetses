@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -578,13 +579,21 @@ namespace ProjectSpetses.Controllers
                 }
             }
             //add the correct answers to the user's stats
+            //check for duplicates to
             if (userStats.CorrectAnswers == null)
             {
                 userStats.CorrectAnswers = correctAnswersList;
             }
             else
             {
-                userStats.CorrectAnswers.AddRange(correctAnswersList);
+                var existing = userStats.CorrectAnswers
+                    .Select(a => (a.GameType, a.GameId))
+                    .ToHashSet();
+                var newUnique = correctAnswersList
+                    .Where(a => !existing.Contains((a.GameType, a.GameId)))
+                    .ToList();
+                userStats.CorrectAnswers.AddRange(newUnique);
+
             }
 
             //append the failed games to the user's stats
@@ -623,15 +632,30 @@ namespace ProjectSpetses.Controllers
                 }
             }
             //add the wrong answers to the user's stats
+            //check for duplicates too
             if (userStats.WrongAnswers == null)
             {
                 userStats.WrongAnswers = wrongAnswersList;
             }
             else
             {
-                userStats.WrongAnswers.AddRange(wrongAnswersList);
+                var existing = userStats.WrongAnswers
+                    .Select(a => (a.GameType, a.GameId))
+                    .ToHashSet();
+                var newUnique = wrongAnswersList
+                    .Where(a => !existing.Contains((a.GameType, a.GameId)))
+                    .ToList();
+                userStats.WrongAnswers.AddRange(newUnique);
             }
-            //should wrong answers be removable?
+            //remove Wrong answers from the correct answers
+            if (userStats.CorrectAnswers != null && userStats.WrongAnswers != null)
+            {
+                var correctSet = userStats.CorrectAnswers
+                    .Select(a => (a.GameType, a.GameId))
+                    .ToHashSet();
+
+                userStats.WrongAnswers.RemoveAll(a => correctSet.Contains((a.GameType, a.GameId)));
+            }
 
             //update the user's stats in the database
             _dbContext.Stats.Update(userStats);
@@ -657,7 +681,6 @@ namespace ProjectSpetses.Controllers
             {
                 Answers = results
             };
-            Debug.WriteLine($"@@@@@Answers: {model.Answers.Count}");
             return View(model);
         }
     }
