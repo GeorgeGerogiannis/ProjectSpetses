@@ -619,7 +619,10 @@ namespace ProjectSpetses.Controllers
             _dbContext.Stats.Update(userStats);
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Results), new { answers = results });
+            //Serialize the results
+            string resultsSerialized = JsonSerializer.Serialize(results);
+
+            return RedirectToAction(nameof(Results), new { json = resultsSerialized });
         }
 
         //gets the user's id from session
@@ -628,13 +631,15 @@ namespace ProjectSpetses.Controllers
             var currentUserId = User.FindFirst("User_id")?.Value;
             return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
         }
-        public async Task<IActionResult> Results(List<GameAnswerViewModel> answers)
+        public async Task<IActionResult> Results(string json)
         {
+            List<GameAnswerViewModel> results = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(json);
+
             GameSubmissionViewModel model = new GameSubmissionViewModel
             {
-                Answers = answers
+                Answers = results
             };
-
+            Debug.WriteLine($"@@@@@Answers: {model.Answers.Count}");
             return View(model);
         }
     }
