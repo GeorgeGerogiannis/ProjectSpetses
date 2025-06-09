@@ -1,7 +1,15 @@
-﻿.content-text {
-    font-size: 16px;
+﻿
+.category_title {
+    color: white;
+
+}
+
+
+
+.content-text {
+    font-size: 20px;
     line-height: 1.5;
-    color: #333;
+    color: #f6f6f6;
 }
 
 .button-row {
@@ -14,4 +22,10 @@
     padding: 8px 20px;
     border-radius: 4px;
     font-size: 16px;
+}
+
+.content-text img {
+    width: 800px;
+    height: auto;
+    padding: 20px 40px;
 }
