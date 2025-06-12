@@ -32,9 +32,9 @@
 		@correctAnswers / @totalAnswers
         <br />
     </span>
-    <a
-       asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
-       asp-action="@nameof(HomeController.Index)">
-        Επιστροφή στην Αρχική Σελίδα
-    </a>
+    
 </div>
+<a asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
+   asp-action="@nameof(HomeController.Index)">
+	Επιστροφή στην Αρχική Σελίδα
+</a>

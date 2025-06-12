@@ -1,27 +1,24 @@
 ﻿@model ProjectSpetses.Models.Entities.Blank_item
 
 <h1>Fill the blanks!</h1>
+<br>
 <form asp-action="@nameof(GamesController.SubmitFillBlank)" method="post">
 
     <div>
-        <h3>@Model.Description1 ____ @Model.Description2</h3>
-        <input type="hidden" name="Answers[0].QuestionId" value="@Model.Id" />
-        <input type="hidden" name="Answers[0].GameType" value="FillBlank" />
-        <ul>
-            @foreach (var answer in Model.Answers)
-            {
-                <li>
-                    <input type="radio"
-                           id="@Model.Id@answer"
-                           name="Answers[0].SelectedValue"
-                           value="@(Model.Solution == answer ? "True" : "False")"
-                           required />
-                    <label for="@Model.Id@answer">
+        <h4>@Model.Description1  
+            <input type="hidden" name="Answers[0].QuestionId" value="@Model.Id" />
+            <input type="hidden" name="Answers[0].GameType" value="FillBlank" />
+            <select name="Answers[0].SelectedValue" required>
+                <option value="" disabled selected>Επίλεξε την Απάντηση</option>
+                @foreach (var answer in Model.Answers)
+                {
+                    <option 
+                        value="@(Model.Solution == answer ? "True" : "False")">
                         @answer
-                    </label>
-                </li>
-            }
-        </ul>
+                    </option>
+                }
+            </select>
+        @Model.Description2</h4>
     </div>
 
     <button type="submit">Submit</button>
