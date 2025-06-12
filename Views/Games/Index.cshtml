@@ -12,7 +12,7 @@
     {
         if (Model.CompletedSectionIds.Contains(i))
         {
-            <a asp-action="@nameof(GamesController.StartGame)"
+            <a asp-action="@nameof(GamesController.StartGameConverter)"
                asp-route-sectionId="@i"
                asp-route-difficulty="easy"
                class="game-card-link">
@@ -26,7 +26,7 @@
                 </div>
             </a>
 
-            <a asp-action="@nameof(GamesController.StartGame)"
+            <a asp-action="@nameof(GamesController.StartGameConverter)"
                asp-route-sectionId="@i"
                asp-route-difficulty="hard"
                class="game-card-link">
