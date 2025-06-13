@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectSpetses.Data;
+using ProjectSpetses.Migrations;
 using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
 
@@ -17,9 +18,12 @@ namespace ProjectSpetses.Controllers
         private readonly ApplicationDbContext _dbContext = dbContext;
         private const string selectedGamesSession = "SelectedGames";
         private const string gameResultsSession = "GameResults";
+        private const string gameDifficulty = "GameDifficulty";
+        private const int pointsEasy = 1;
+        private const int pointsHard = 2;
 
-        public async Task<IActionResult> StartGameConverter(int duration, string sections, string? difficulty,
-            string? requiredQuiz, string? requiredBlank, string? requiredMatch)
+        public async Task<IActionResult> StartGameConverter(int duration, string sections, 
+            string? difficulty, string? requiredQuiz, string? requiredBlank, string? requiredMatch)
         {
             //check if user is authenticated
             if (!User.Identity.IsAuthenticated)
@@ -51,7 +55,7 @@ namespace ProjectSpetses.Controllers
 
             //if the user has not unlocked one of the sections, redirect to the games page
             if (unlockledSections == null || !sectionList.All(unlockledSections.Contains))
-            { 
+            {
                 return RedirectToAction(nameof(Index), nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]);
             }
 
@@ -77,8 +81,8 @@ namespace ProjectSpetses.Controllers
              */
         }
 
-        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, string? difficulty = null, List<ushort>? requiredQuiz = null,
-            List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
+        public async Task<IActionResult> StartGame(int duration, List<ushort> sections, string? difficulty = null, 
+            List<ushort>? requiredQuiz = null, List<ushort>? requiredBlank = null, List<ushort>? requiredMatch = null)
         {
             //this might need "await" on every call
             //Load all items from the database
@@ -268,6 +272,23 @@ namespace ProjectSpetses.Controllers
             //save them in session
             HttpContext.Session.SetString(selectedGamesSession, JsonSerializer.Serialize(wrappedGames));
             HttpContext.Session.SetString(gameResultsSession, "");
+            if (difficulty == null)
+                difficulty = "none";
+            //figure out what game we playing
+            string pointType = "skip";
+            if (difficulty == null || sections.Count != 1)
+            { 
+                pointType = "skip";//skip point giving 
+            }
+            else if (difficulty == "easy")
+            {
+                pointType = sections[0].ToString() + "easy";
+            }
+            else if (difficulty == "hard")
+            {
+                pointType = sections[0].ToString() + "hard";
+            }
+            HttpContext.Session.SetString(gameDifficulty, pointType);
 
             //HttpContext.Session.SetString("Test", "I work");
             return RedirectToAction(nameof(NextGame));
@@ -276,9 +297,6 @@ namespace ProjectSpetses.Controllers
         [HttpGet]
         public async Task<IActionResult> NextGame()
         {
-            //string test = HttpContext.Session.GetString("Test");
-            //Debug.WriteLine($"Test variable value: {test}");
-
             string json = HttpContext.Session.GetString(selectedGamesSession);
             var deserializedGames = JsonSerializer.Deserialize<List<GameWrapper>>(json);
             List<object> selectedGames = [];
@@ -365,7 +383,6 @@ namespace ProjectSpetses.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -661,6 +678,13 @@ namespace ProjectSpetses.Controllers
             _dbContext.Stats.Update(userStats);
             await _dbContext.SaveChangesAsync();
 
+            //combine WordMatch results if needed
+            if (results.Any(r => r.GameType == "WordMatch"))
+                results = CombineWordMatches(results);
+
+            //calculate the points earned
+            AddPoints(results);
+
             //Serialize the results
             string resultsSerialized = JsonSerializer.Serialize(results);
 
@@ -681,7 +705,127 @@ namespace ProjectSpetses.Controllers
             {
                 Answers = results
             };
+
             return View(model);
+        }
+    
+        public List<GameAnswerViewModel> CombineWordMatches(List<GameAnswerViewModel> results)
+        {
+            //check if all the WordMatch items were correct
+            bool wordMatchCorrect = true;
+            if (results.Any(a => a.GameType == "WordMatch"))
+            {
+                if (results.Any(a => a.SelectedValue == "False" && a.GameType == "WordMatch"))
+                {
+                    wordMatchCorrect = false;
+                }
+                // keep only one WordMatch item in the results
+                int FirstWordMatch = results.FindIndex(a => a.GameType == "WordMatch");
+                results[FirstWordMatch] = new GameAnswerViewModel
+                {
+                    QuestionId = 0, //placeholder ID for WordMatch
+                    SelectedValue = wordMatchCorrect ? "True" : "False",
+                    GameType = "FinalWordMatch"
+                };
+                results.RemoveAll(a => a.GameType == "WordMatch");
+            }
+            return results;
+        }
+
+        public async void AddPoints(List<GameAnswerViewModel> results)
+        {            
+            //get the user's stats from the database
+            Guid userId = GetCurrentUserId();
+            Stats userStats = _dbContext.Stats.FirstOrDefault(s => s.Id == userId);
+            PointsEarned allPoints = _dbContext.PointsEarned.FirstOrDefault(p => p.Id == userId);
+            //find what game we playing
+            string pointType = HttpContext.Session.GetString(gameDifficulty);
+            
+            //calculate the points earned
+            int newPoints = 0;
+            if (pointType == null || pointType == "skip")
+            {
+                return;
+            }
+            else if (pointType.Substring(1) == "easy")
+            {
+                newPoints = results.Count * pointsEasy;
+            }
+            else if (pointType.Substring(1) == "hard")
+            { 
+                newPoints = results.Count * pointsHard;
+            }
+            //find the old points
+            if (pointType[0] == '1')
+            {
+                if (pointType.Substring(1) == "easy")
+                {
+                    int oldPoints = (int)allPoints.Section1Easy;
+                    if (newPoints > oldPoints)
+                        allPoints.Section1Easy = (uint)newPoints;
+                }
+                else if (pointType.Substring(1) == "hard")
+                {
+                    int oldPoints = (int)allPoints.Section1Hard;
+                    if (newPoints > oldPoints)
+                        allPoints.Section1Hard = (uint)newPoints;
+                }
+            }
+            else if (pointType[0] == '2')
+            {
+                if (pointType.Substring(1) == "easy")
+                {
+                    int oldPoints = (int)allPoints.Section2Easy;
+                    if (newPoints > oldPoints)
+                        allPoints.Section2Easy = (uint)newPoints;
+                }
+                else if (pointType.Substring(1) == "hard")
+                {
+                    int oldPoints = (int)allPoints.Section2Hard;
+                    if (newPoints > oldPoints)
+                        allPoints.Section2Hard = (uint)newPoints;
+                }
+            }
+            else if (pointType[0] == '3')
+            {
+                if (pointType.Substring(1) == "easy")
+                {
+                    int oldPoints = (int)allPoints.Section3Easy;
+                    if (newPoints > oldPoints)
+                        allPoints.Section3Easy = (uint)newPoints;
+                }
+                else if (pointType.Substring(1) == "hard")
+                {
+                    int oldPoints = (int)allPoints.Section3Hard;
+                    if (newPoints > oldPoints)
+                        allPoints.Section3Hard = (uint)newPoints;
+                }
+            }
+            else if (pointType[0] == '4')
+            {
+                if (pointType.Substring(1) == "easy")
+                {
+                    int oldPoints = (int)allPoints.Section4Easy;
+                    if (newPoints > oldPoints)
+                        allPoints.Section4Easy = (uint)newPoints;
+                }
+                else if (pointType.Substring(1) == "hard")
+                {
+                    int oldPoints = (int)allPoints.Section4Hard;
+                    if (newPoints > oldPoints)
+                        allPoints.Section4Hard = (uint)newPoints;
+                }
+            }
+            //update the user's points in the database
+            _dbContext.PointsEarned.Update(allPoints);
+            //calculate the total points
+            uint totalPoints = allPoints.Section1Easy + allPoints.Section1Hard +
+                               allPoints.Section2Easy + allPoints.Section2Hard +
+                               allPoints.Section3Easy + allPoints.Section3Hard +
+                               allPoints.Section4Easy + allPoints.Section4Hard;
+            userStats.TotalPoints = totalPoints;
+            _dbContext.Stats.Update(userStats);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
