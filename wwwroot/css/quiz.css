@@ -1,0 +1,86 @@
+﻿h1 {
+    text-align: center;
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-weight: 300;
+}
+
+form {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+h3 {
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 400;
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 15px;
+    margin-bottom: 2rem;
+}
+
+.item {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.item:hover {
+    background: #e3f2fd;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + label {
+    background: #00a80e;
+    color: white;
+}
+
+input[type="radio"]:checked + label::after {
+    content: '✓';
+    float: right;
+}
+
+label {
+    display: block;
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #2c3e50;
+    border-radius: 12px;
+}
+
+label:hover {
+    background: #e8f5e8;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background: #00a80e;
+    color: white;
+    border: none;
+    padding: 18px;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+}

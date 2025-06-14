@@ -1,0 +1,151 @@
+﻿h2 {
+    text-align: center;
+    color: white;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-weight: 300;
+}
+
+form {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.match-container {
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    justify-items: center;
+    padding: 20px;
+    background: #eff0f1;
+    border-radius: 15px;
+    border: 2px solid #dee2e6;
+    min-height: 150px;
+}
+
+.palette::before {
+    text-align: center;
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: 10px;
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.palette img {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 12px;
+    cursor: grab;
+    transition: all 0.3s ease;
+    border: 3px solid #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.palette img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+
+.palette img:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 100px;
+    padding: 30px;
+    background: #f0fff0;
+    border-radius: 15px;
+    border: 2px solid #c8e6c9;
+}
+
+.board::before {
+    text-align: center;
+    color: #2e7d32;
+    font-weight: 500;
+    font-size: 1.1rem;
+    border-radius: 10px;
+}
+
+.dropzone {
+    min-height: 140px;
+    border: 3px dashed #81c784;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    position: relative;
+    padding: 15px;
+}
+
+.droptext {
+    color: #2e7d32;
+    text-align: center;
+}
+
+.dropzone img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #4caf50;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+button[type="submit"] {
+    background: #2dbd34;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+}
+
+button[type="button"] {
+    background: #ff2121;
+    color: white;
+}
+
+button[type="button"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 87, 34, 0.3);
+}
+
