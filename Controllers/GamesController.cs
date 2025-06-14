@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -10,6 +11,7 @@ using ProjectSpetses.Data;
 using ProjectSpetses.Migrations;
 using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ProjectSpetses.Controllers
 {
@@ -23,7 +25,7 @@ namespace ProjectSpetses.Controllers
         private const int pointsHard = 24;
 
         public async Task<IActionResult> StartGameConverter(int duration, string sections, 
-            string? difficulty, string? requiredQuiz, string? requiredBlank, string? requiredMatch)
+            string? difficulty, string? requiredSections)
         {
             //check if user is authenticated
             if (!User.Identity.IsAuthenticated)
@@ -41,11 +43,10 @@ namespace ProjectSpetses.Controllers
                          .Select(v => v.Value)
                          .ToList();
             //parse the sections from the string to a List<ushort>
-            var sectionList = ParseList(sections);
-            //same but also makes them null if they are empty
-            var quizList = string.IsNullOrWhiteSpace(requiredQuiz) ? null : ParseList(requiredQuiz);
-            var blankList = string.IsNullOrWhiteSpace(requiredBlank) ? null : ParseList(requiredBlank);
-            var matchList = string.IsNullOrWhiteSpace(requiredMatch) ? null : ParseList(requiredMatch);
+            List<ushort> sectionList = ParseList(sections);
+
+            //Get the required section games
+            var (quizList, blankList, matchList) = await GetRequiredGames(sectionList);
 
             //check if the user has unlocked the games for the selected sections
             var unlockledSections = await _dbContext.Stats
@@ -838,5 +839,64 @@ namespace ProjectSpetses.Controllers
             _dbContext.Stats.Update(userStats);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<(List<Quiz_item>, List<Blank_item>, List<Match_item>)> GetRequiredGames(
+            List<ushort>? requiredSections)
+        {
+            if (requiredSections == null)
+            {
+                return (null, null, null);
+            }
+            else
+            {
+                //get all items from the database
+                List<Quiz_item> quiz_items = await _dbContext.Quiz_items.ToListAsync();
+                List<Blank_item> blank_items = await _dbContext.Blank_items.ToListAsync();
+                List<Match_item> match_items = await _dbContext.Match_items.ToListAsync();
+                //get what the Questions the user has failed
+                Stats stats = _dbContext.Stats.FirstOrDefault(s => s.Id == GetCurrentUserId());
+                List<Quiz_item> allRequiredQuiz = null;
+                if (stats != null && stats.WrongAnswers != null)
+                {
+                    var wrongQuizIds = stats.WrongAnswers
+                        .Where(a => a.GameType == "Quiz")
+                        .Select(a => (ushort)a.GameId)
+                        .ToHashSet();
+                    allRequiredQuiz = quiz_items
+                        .Where(q => wrongQuizIds.Contains(q.Id))
+                        .ToList();
+                }
+                List<Blank_item> allRequiredBlank = null;
+                if (stats != null && stats.WrongAnswers != null)
+                {
+                    var wrongBlankIds = stats.WrongAnswers
+                        .Where(a => a.GameType == "FillBlank")
+                        .Select(a => (ushort)a.GameId)
+                        .ToHashSet();
+                    allRequiredBlank = blank_items
+                        .Where(b => wrongBlankIds.Contains(b.Id))
+                        .ToList();
+                }
+                List<Match_item> allRequiredMatch = null;
+                if (stats != null && stats.WrongAnswers != null)
+                {
+                    var wrongMatchIds = stats.WrongAnswers
+                        .Where(a => a.GameType == "WordMatch")
+                        .Select(a => (ushort)a.GameId)
+                        .ToHashSet();
+                    allRequiredMatch = match_items
+                        .Where(m => wrongMatchIds.Contains(m.Id))
+                        .ToList();
+                }
+                //filter the items by the required sections
+                allRequiredQuiz = allRequiredQuiz?.Where(q => requiredSections.Contains(q.SectionId)).ToList();
+                allRequiredBlank = allRequiredBlank?.Where(b => requiredSections.Contains(b.SectionId)).ToList();
+                allRequiredMatch = allRequiredMatch?.Where(m => requiredSections.Contains(m.SectionId)).ToList();
+
+
+                return (allRequiredQuiz, allRequiredBlank, allRequiredMatch);
+            }
+        }
+
     }
 }
