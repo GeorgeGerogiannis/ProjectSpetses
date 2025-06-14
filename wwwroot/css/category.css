@@ -1,16 +1,24 @@
 ﻿
 .category_title {
     color: white;
-
 }
 
-
+.paging {
+    color: white;
+    margin-top: 40px;
+    margin-bottom: 60px;
+}
 
 .content-text {
     font-size: 20px;
     line-height: 1.5;
     color: #f6f6f6;
 }
+
+.content-text h2{
+    margin-top: 30px;
+}
+
 
 .button-row {
     display: flex;
@@ -27,5 +35,16 @@
 .content-text img {
     width: 800px;
     height: auto;
-    padding: 20px 40px;
+    margin: 40px 0px 40px;
+    border: 3px solid #f6f6f6;
+    border-radius: 5%;
+}
+
+.content-text iframe {
+    width: 800px;
+    height: 500px;
+
+    margin: 40px 0px 40px;
+    border: 3px solid #f6f6f6;
+    border-radius: 5%;
 }
