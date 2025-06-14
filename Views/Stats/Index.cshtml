@@ -11,6 +11,6 @@
     Πόντοι: @Model.TotalPoints
     Ολοκληρομένες Eνότητες: @Model.SectionsCompleted
     Ολοκληρομένες Υποενότητες: @Model.CategoriesCompleted
-    Σωστές Απαντήσεις/Λάθος Απαντήσεις: @Model.CorrectAnswers/@Model.WrongAnswers (Λόγος: @(Model.WrongAnswers != 0 ? Model.CorrectAnswers/Model.WrongAnswers : "0"))
+    Σωστές Απαντήσεις/Λάθος Απαντήσεις: @Model.CorrectAnswers/@Model.WrongAnswers (Λόγος: @(Model.WrongAnswers != 0 ? (float)Model.CorrectAnswers / (float)Model.WrongAnswers : "0"))
 </p>
 
