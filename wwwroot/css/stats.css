@@ -5,3 +5,75 @@
     display: flex;
     justify-content: center;
 }
+
+
+
+
+.progress-card {
+    margin-top: 80px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+
+.progress-card-header {
+    /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+    background: linear-gradient(45deg, #28a745, #20c997);
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+
+.progress-card-header h3 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+
+.progress-card-body {
+    padding: 25px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    display: inline-flex;
+    font-weight: 500;
+    align-items: center;
+    color: #666;
+}
+
+.detail-label i {
+    font-size: 16px;
+    margin-right: 6px;
+    color: #28a745; 
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #333;
+}
+
+
+.progress-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 45px rgba(0, 0, 0, 0.15);
+}
