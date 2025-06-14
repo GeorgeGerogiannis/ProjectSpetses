@@ -19,8 +19,8 @@ namespace ProjectSpetses.Controllers
         private const string selectedGamesSession = "SelectedGames";
         private const string gameResultsSession = "GameResults";
         private const string gameDifficulty = "GameDifficulty";
-        private const int pointsEasy = 1;
-        private const int pointsHard = 2;
+        private const int pointsEasy = 20;
+        private const int pointsHard = 24;
 
         public async Task<IActionResult> StartGameConverter(int duration, string sections, 
             string? difficulty, string? requiredQuiz, string? requiredBlank, string? requiredMatch)
@@ -155,15 +155,23 @@ namespace ProjectSpetses.Controllers
                         selectedGames.Add(quizItem);
                         quiz_items.RemoveAll(q => q.Id == quizItem.Id);
                         allRequired.RemoveAt(randomIndex);
+                        duration--;
                     }
                     else if (allRequired[randomIndex] is Blank_item blankItem)
                     {
                         selectedGames.Add(blankItem);
                         blank_items.RemoveAll(b => b.Id == blankItem.Id);
                         allRequired.RemoveAt(randomIndex);
+                        duration--;
                     }
                     else if (allRequired[randomIndex] is Match_item matchItem)
                     {
+                        if (!selectedGames.Any(selectedGames => selectedGames is Match_item))
+                        {
+                            //only count the First WordMatch as an individual game
+                            i--;
+                            duration--;
+                        }
                         selectedGames.Add(matchItem);
                         match_items.RemoveAll(m => m.Id == matchItem.Id);
                         allRequired.RemoveAt(randomIndex);
@@ -174,8 +182,6 @@ namespace ProjectSpetses.Controllers
                         break;
                 }
             }
-            //adjust the duration in case any required games where added
-            duration -= selectedGames.Count;
 
             //remove items that are not in the selected sections
             quiz_items = quiz_items.Where(q => sections.Contains(q.SectionId)).ToList();
@@ -224,6 +230,11 @@ namespace ProjectSpetses.Controllers
                 }
                 else if (gameType == 'M')
                 {
+                    if (selectedGames.Any(selectedGames => selectedGames is Match_item))
+                    {
+                        //if there is already one WordMatch, don't count the rest as individual games
+                        i--;
+                    }
                     int randomIndex = new Random().Next(match_items.Count);
                     selectedGames.Add(match_items[randomIndex]);
                     match_items.RemoveAt(randomIndex);
@@ -248,7 +259,7 @@ namespace ProjectSpetses.Controllers
                 else
                 {
                     //if no Match games are left, make a placeholder Match game
-                    if (quiz_items.Count > 0)
+                    if (match_items.Count > 0)
                     {
                         var matchItem = new Match_item
                         {

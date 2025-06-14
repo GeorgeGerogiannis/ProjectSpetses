@@ -15,6 +15,7 @@
             <a asp-action="@nameof(GamesController.StartGameConverter)"
                asp-route-sectionId="@i"
                asp-route-difficulty="easy"
+               asp-route-duration="5"
                class="game-card-link">
                 <div class="game-card easy">
                     <div class="game-info">
@@ -29,6 +30,7 @@
             <a asp-action="@nameof(GamesController.StartGameConverter)"
                asp-route-sectionId="@i"
                asp-route-difficulty="hard"
+               asp-route-duration="5"
                class="game-card-link">
                 <div class="game-card hard">
                     <div class="game-info">
@@ -76,7 +78,7 @@
     }
 </div>
 
-<footer class="border-top footer text-muted">
+@* <footer class="border-top footer text-muted">
     <div class="container">
         Testing - 
         <a asp-controller="Games" 
@@ -86,4 +88,4 @@
            Testing initiation
        </a>
     </div>
-</footer>
+</footer> *@
