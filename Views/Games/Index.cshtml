@@ -12,13 +12,16 @@
     {
         if (Model.CompletedSectionIds.Contains(i))
         {
+            var easyCompleted = Model.SectionPointsEarned[$"Section{i}Easy"] >= 100;
+            var hardCompleted = Model.SectionPointsEarned[$"Section{i}Hard"] >= 120;
+            
             <a asp-action="@nameof(GamesController.StartGameConverter)"
                asp-route-duration="5"
                asp-route-sections="@i"
                asp-route-difficulty="easy"
                asp-route-duration="5"
-               class="game-card-link">
-                <div class="game-card easy">
+               class="game-card-link @(easyCompleted ? "completed" : "")">
+                <div class="game-card easy @(easyCompleted ? "completed" : "")">
                     <div class="game-info">
                         <h3 class="game-title">
                             @Model.SectionNames[i - 1]
@@ -26,6 +29,12 @@
                         <p class="game-description">Εύκολο</p>
                         <p class="game-points">@Model.SectionPointsEarned[$"Section{i}Easy"]/100</p>
                     </div>
+                    @if (easyCompleted)
+                    {
+                        <div class="completion-overlay">
+                            ✓
+                        </div>
+                    }
                 </div>
             </a>
 
@@ -34,8 +43,8 @@
                asp-route-sections="@i"
                asp-route-difficulty="hard"
                asp-route-duration="5"
-               class="game-card-link">
-                <div class="game-card hard">
+               class="game-card-link @(hardCompleted ? "completed" : "")">
+                <div class="game-card hard @(hardCompleted ? "completed" : "")">
                     <div class="game-info">
                         <h3 class="game-title">
                             @Model.SectionNames[i - 1]
@@ -43,6 +52,12 @@
                         <p class="game-description">Δύσκολο</p>
                         <p class="game-points">@Model.SectionPointsEarned[$"Section{i}Hard"]/120</p>
                     </div>
+                    @if (hardCompleted)
+                    {
+                        <div class="completion-overlay">
+                            ✓
+                        </div>
+                    }
                 </div>
             </a>
         }
@@ -57,8 +72,8 @@
                         <p class="game-description">Εύκολο</p>
                     </div>
                     <div class="lock-overlay">
-                            <span class="lock-icon">🔒</span>
-                            <div class="points-required">Διαβάστε την ενότητα @i</div>
+                        <span class="lock-icon">🔒</span>
+                        <div class="points-required">Διαβάστε την ενότητα @i</div>
                     </div>
                 </div>
             </a>
@@ -72,8 +87,8 @@
                         <p class="game-description">Δύσκολο</p>
                     </div>
                     <div class="lock-overlay">
-                            <span class="lock-icon">🔒</span>
-                            <div class="points-required">Διαβάστε την ενότητα @i</div>
+                        <span class="lock-icon">🔒</span>
+                        <div class="points-required">Διαβάστε την ενότητα @i</div>
                     </div>
                 </div>
             </a>
