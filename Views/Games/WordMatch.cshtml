@@ -52,6 +52,7 @@
                             <input type="hidden" name="Answers[@optionIndex].QuestionId" value="" />
                             <input type="hidden" name="Answers[@optionIndex].SelectedValue" value="" />
                         </div>
+                        break;
                     }
                 }
             }
@@ -111,7 +112,7 @@
         inputQuestionId.value = draggedEl.id;
         //Set whether its right or false into the Selected Value
         const inputSelected = dropzone.querySelector('input[type="hidden"][name$=".SelectedValue"]');
-        if (draggedEl.getAttribute('data-match') === dropzone.data-accept) {
+        if (draggedEl.getAttribute('data-match') === dropzone.getAttribute('data-accept')) {
             inputSelected.value = "True";
         } else {
             inputSelected.value = "False";
