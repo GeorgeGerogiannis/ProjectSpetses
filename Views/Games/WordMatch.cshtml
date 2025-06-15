@@ -21,7 +21,7 @@
                      id="@item.Id"
                      draggable="true"
                      ondragstart="dragstartHandler(event)"
-                     data-match="@item.Id-Solution">
+                     data-match="@item.Solution">
             }
         </section>
     </div>
@@ -39,9 +39,10 @@
                              id="@item.Id-Solution"
                              ondragover="dragoverHandler(event)"
                              ondrop="dropHandler(event)"
-                             data-accept="@item.Id">
+                             data-accept="@item.Solution">
                             <span class="droptext"
-                                  id="@item.Id-Solution-Span">
+                                  id="@item.Id-Solution-Span"
+                                  data-accept="@item.Solution">
                                 @item.Solution
                             </span>
                             @{
@@ -110,7 +111,7 @@
         inputQuestionId.value = draggedEl.id;
         //Set whether its right or false into the Selected Value
         const inputSelected = dropzone.querySelector('input[type="hidden"][name$=".SelectedValue"]');
-        if (draggedEl.getAttribute('data-match') === dropzone.id) {
+        if (draggedEl.getAttribute('data-match') === dropzone.data-accept) {
             inputSelected.value = "True";
         } else {
             inputSelected.value = "False";
