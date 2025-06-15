@@ -29,10 +29,14 @@
             <span class="score">@correctAnswers / @totalAnswers</span>
         </div>
 
+        <div class="score-display">
+            <span class="points">Πόντοι: @Model.Points</span>
+        </div>
+
         <a class="btn-return"
-           asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
-           asp-action="@nameof(HomeController.Index)">
-            Επιστροφή στην Αρχική Σελίδα
+           asp-controller="@nameof(GamesController)[..nameof(GamesController).LastIndexOf("Controller")]"
+           asp-action="@nameof(GamesController.Index)">
+            Επιστροφή στις δραστηριότητες
         </a>
     </div>
 </div>

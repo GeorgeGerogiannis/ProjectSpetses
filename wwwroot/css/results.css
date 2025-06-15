@@ -60,6 +60,15 @@ h2 {
     -webkit-text-fill-color: transparent;
 }
 
+.points {
+    font-size: 2em;
+    font-weight: bold;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 .btn-return {
     display: inline-block;
     padding: 12px 30px;

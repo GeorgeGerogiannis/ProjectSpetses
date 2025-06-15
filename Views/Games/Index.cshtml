@@ -24,6 +24,7 @@
                             @Model.SectionNames[i - 1]
                         </h3>
                         <p class="game-description">Εύκολο</p>
+                        <p class="game-points">@Model.SectionPointsEarned[$"Section{i}Easy"]/100</p>
                     </div>
                 </div>
             </a>
@@ -40,6 +41,7 @@
                             @Model.SectionNames[i - 1]
                         </h3>
                         <p class="game-description">Δύσκολο</p>
+                        <p class="game-points">@Model.SectionPointsEarned[$"Section{i}Hard"]/120</p>
                     </div>
                 </div>
             </a>

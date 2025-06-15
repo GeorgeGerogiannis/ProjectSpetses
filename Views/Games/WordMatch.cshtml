@@ -154,12 +154,7 @@
             if (!img) {
                 allFilled = false;
             }
-            if (!allFilled) {
-                alert('Not all boxes have been filled');
-                e.preventDefault();
-                return false;
-            }
-
+            
             //pre session input system
             // const isCorrect = img && img.id === zone.dataset.accept;
             // const input = document.createElement('input');
@@ -168,5 +163,11 @@
             // input.value = isCorrect;
             // inputContainer.appendChild(input);
         });
+
+        if (!allFilled) {
+            alert('Not all boxes have been filled');
+            e.preventDefault();
+            return false;
+        }
     });
 </script>

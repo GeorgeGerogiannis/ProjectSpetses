@@ -1,17 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using ProjectSpetses.Data;
-using ProjectSpetses.Migrations;
 using ProjectSpetses.Models;
 using ProjectSpetses.Models.Entities;
-using static System.Collections.Specialized.BitVector32;
 
 namespace ProjectSpetses.Controllers
 {
@@ -69,17 +62,6 @@ namespace ProjectSpetses.Controllers
                 requiredBlank = blankList,
                 requiredMatch = matchList
             });
-
-            //the following code is an example on how to call the StartGameConverter Method in HTML
-            /*
-                <a 
-                    asp-controller="Games" 
-                    asp-action="@nameof(GamesController.StartGameConverter)"
-                    asp-route-duration="10"
-	                   asp-route-sections="1,2,3">
-                    Testing initiation
-                </a>
-             */
         }
 
         public async Task<IActionResult> StartGame(int duration, List<ushort> sections, string? difficulty = null, 
@@ -419,12 +401,31 @@ namespace ProjectSpetses.Controllers
                 .Select(s => s.SectionsCompleted)
                 .FirstOrDefaultAsync();
 
+
+            //get the user's points earned
+            var pointsEarned = await _dbContext.PointsEarned
+                .Where(p => p.Id == GetCurrentUserId())
+                .FirstOrDefaultAsync();
+
+            var points = new Dictionary<string, uint>
+            {
+                { "Section1Easy", pointsEarned.Section1Easy },
+                { "Section1Hard", pointsEarned.Section1Hard },
+                { "Section2Easy", pointsEarned.Section2Easy },
+                { "Section2Hard", pointsEarned.Section2Hard },
+                { "Section3Easy", pointsEarned.Section3Easy },
+                { "Section3Hard", pointsEarned.Section3Hard },
+                { "Section4Easy", pointsEarned.Section4Easy },
+                { "Section4Hard", pointsEarned.Section4Hard }
+            };
+
             //create the model
             var model = new GamesViewModel
             {
                 SectionCount = (ushort)sectionCount,
                 CompletedSectionIds = completedSections,
-                SectionNames = sectionNames
+                SectionNames = sectionNames,
+                SectionPointsEarned = points
             };
 
             return View(model);
@@ -695,12 +696,12 @@ namespace ProjectSpetses.Controllers
                 results = CombineWordMatches(results);
 
             //calculate the points earned
-            AddPoints(results);
+            int pointsEarned = await AddPoints(results);
 
             //Serialize the results
             string resultsSerialized = JsonSerializer.Serialize(results);
 
-            return RedirectToAction(nameof(Results), new { json = resultsSerialized });
+            return RedirectToAction(nameof(Results), new { json = resultsSerialized, points = pointsEarned });
         }
 
         //gets the user's id from session
@@ -709,13 +710,14 @@ namespace ProjectSpetses.Controllers
             var currentUserId = User.FindFirst("User_id")?.Value;
             return Guid.TryParse(currentUserId, out Guid userId) ? userId : Guid.Empty;
         }
-        public async Task<IActionResult> Results(string json)
+        public async Task<IActionResult> Results(string json, int points)
         {
             List<GameAnswerViewModel> results = JsonSerializer.Deserialize<List<GameAnswerViewModel>>(json);
 
             GameSubmissionViewModel model = new GameSubmissionViewModel
             {
-                Answers = results
+                Answers = results,
+                Points = points
             };
 
             return View(model);
@@ -744,7 +746,7 @@ namespace ProjectSpetses.Controllers
             return results;
         }
 
-        public async void AddPoints(List<GameAnswerViewModel> results)
+        public async Task<int> AddPoints(List<GameAnswerViewModel> results)
         {            
             //get the user's stats from the database
             Guid userId = GetCurrentUserId();
@@ -757,15 +759,15 @@ namespace ProjectSpetses.Controllers
             int newPoints = 0;
             if (pointType == null || pointType == "skip")
             {
-                return;
+                return newPoints;
             }
             else if (pointType.Substring(1) == "easy")
             {
-                newPoints = results.Count * pointsEasy;
+                newPoints = results.Where(r => r.SelectedValue == "True").Count() * pointsEasy;
             }
             else if (pointType.Substring(1) == "hard")
             { 
-                newPoints = results.Count * pointsHard;
+                newPoints = results.Where(r => r.SelectedValue == "True").Count() * pointsHard;
             }
             //find the old points
             if (pointType[0] == '1')
@@ -838,6 +840,8 @@ namespace ProjectSpetses.Controllers
             userStats.TotalPoints = totalPoints;
             _dbContext.Stats.Update(userStats);
             await _dbContext.SaveChangesAsync();
+
+            return newPoints;
         }
 
         public async Task<(List<Quiz_item>, List<Blank_item>, List<Match_item>)> GetRequiredGames(
