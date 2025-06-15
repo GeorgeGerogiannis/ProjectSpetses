@@ -1,5 +1,7 @@
 ﻿@model ProjectSpetses.Models.Entities.Quiz_item
 
+<link rel="stylesheet" href="~/css/quiz.css" />
+
 <h1>Quizzes</h1>
 <form asp-action="@nameof(GamesController.SubmitQuiz)" method="post">
 
@@ -7,15 +9,15 @@
         <h3>@Model.Description</h3>
         <input type="hidden" name="Answers[0].QuestionId" value="@Model.Id" />
         <input type="hidden" name="Answers[0].GameType" value="Quiz" />
-        <ul>
+        <ul class="item-list">
             @foreach (var answer in Model.Answers)
             {
-                <li>
+                <li class="item">
                     <input type="radio"
-                            id="@Model.Id@answer"
-                            name="Answers[0].SelectedValue"
-                            value="@(Model.Solution == answer ? "True" : "False")"
-                            required />
+                           id="@Model.Id@answer"
+                           name="Answers[0].SelectedValue"
+                           value="@(Model.Solution == answer ? "True" : "False")"
+                           required />
                     <label for="@Model.Id@answer">
                         @answer
                     </label>
@@ -24,28 +26,5 @@
         </ul>
     </div>
 
-    <button type="submit">Submit</button>
+    <button type="submit">SUBMIT</button>
 </form>
-
-@* @for (int i = 0; i < Model.Count; i++)
-{
-    <div>
-        <h3>@Model[i].Description</h3>
-        <input type="hidden" name="Answers[@i].QuestionId" value="@Model[i].Id" />
-        <ul>
-            @foreach (var answer in Model[i].Answers)
-            {
-                <li>
-                    <input type="radio"
-                           id="@Model[i].Id@answer"
-                           name="Answers[@i].SelectedValue"
-                           value="@(Model[i].Solution == answer ? "True" : "False")"
-                           required />
-                    <label for="@Model[i].Id@answer">@answer</label>
-                </li>
-            }
-        </ul>
-    </div>
-} *@
-
-

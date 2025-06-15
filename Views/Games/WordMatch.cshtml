@@ -1,260 +1,172 @@
 ﻿@model (List<ProjectSpetses.Models.Entities.Match_item>, List<string>)
 
+<link rel="stylesheet" href="~/css/word_match.css" />
+
 @{
     var matchItems = Model.Item1;
     var dropList = Model.Item2;
 }
-<style>
 
-    .container {
-        flex-wrap: wrap;
-        gap: 3rem;
-    }
+<h2>Ταίριαξε την κάθε εικόνα με την περιγραφή της</h2>
 
-    .palette, .board {
-        padding: 1rem;
-        border: 2px dashed #ccc;
-        border-radius: 1rem;
-        background: #fff;
-    }
+<form asp-action="@nameof(GamesController.SubmitWordMatch)" id="match-form" method="post">
 
-    .palette {
-        display: flex;
-        gap: 1rem;
-    }
+    <!-- Draggable Images -->
+    <div class="match-container">
+        <section class="palette">
+            @foreach (var item in matchItems)
+            {
+                <img src="@item.Image"
+                     alt="/images/placeholder.png"
+                     id="@item.Id"
+                     draggable="true"
+                     ondragstart="dragstartHandler(event)"
+                     data-match="@item.Id-Solution">
+            }
+        </section>
+    </div>
 
-        .palette img {
-            width: 120px;
-            cursor: grab;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-    .board {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 1rem;
-    }
-
-    .dropzone {
-        width: 140px;
-        height: 140px;
-        border: 3px dashed #999;
-        background: #f9f9f9;
-        align-items: center;
-        align-content: center;
-        text-align: center;
-    }
-
-        .dropzone img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 0.5rem;
-        }
-
-
-</style>
-<head>
-    <meta charset="UTF-8">
-    <title>Drag and Drop Match</title>
-</head>
-<body>
-    
-    <h2>Ταίριαξε τη κάθε εικόνα με την περιγραφή της</h2>
-
-    <form asp-action="@nameof(GamesController.SubmitWordMatch)" id="match-form" method="post">
-
-		<!-- Draggable Images -->
-        <div class="container">
-            <section class="palette">
+    <!-- Drop Zones -->
+    <div class="container">
+        <section class="board">
+            @foreach (var option in dropList)
+            {
                 @foreach (var item in matchItems)
                 {
-                    <img src="@item.Image"
-						 alt="/images/placeholder.png"
-						 id="@item.Id"
-						 draggable="true"
-						 ondragstart="dragstartHandler(event)"
-						 data-match="@item.Id-Solution">
-                }
-            </section>
-        </div>
-
-		<!-- Drop Zones -->
-        <div class="container">
-            <section class="board">
-                @foreach (var option in dropList)
-                {
-                    @foreach (var item in matchItems)
+                    if (item.Solution == option)
                     {
-                        if (item.Solution == option)
-                        {
-                            <div class="dropzone" 
-                                id="@item.Id-Solution" 
-                                ondragover="dragoverHandler(event)"
-                                ondrop="dropHandler(event)" 
-                                data-accept="@item.Id">
-                                    <span class="droptext" 
-                                        id="@item.Id-Solution-Span">
-                                            @item.Solution
-                                    </span>
-                                    @{
-                                        int optionIndex = dropList.IndexOf(option);
-                                    }
-                                    <input type="hidden" name="Answers[@optionIndex].GameType" value="WordMatch"/>
-                                    <input type="hidden" name="Answers[@optionIndex].QuestionId" value=""/>
-                                    <input type="hidden" name="Answers[@optionIndex].SelectedValue" value=""/>
-                            </div>
-                        }
+                        <div class="dropzone"
+                             id="@item.Id-Solution"
+                             ondragover="dragoverHandler(event)"
+                             ondrop="dropHandler(event)"
+                             data-accept="@item.Id">
+                            <span class="droptext"
+                                  id="@item.Id-Solution-Span">
+                                @item.Solution
+                            </span>
+                            @{
+                                int optionIndex = dropList.IndexOf(option);
+                            }
+                            <input type="hidden" name="Answers[@optionIndex].GameType" value="WordMatch" />
+                            <input type="hidden" name="Answers[@optionIndex].QuestionId" value="" />
+                            <input type="hidden" name="Answers[@optionIndex].SelectedValue" value="" />
+                        </div>
                     }
                 }
-            </section>
-        </div>
+            }
+        </section>
+    </div>
 
-        <div class="actions">
-            <button type="submit">Submit Answers</button>
-            <button type="button" onclick="resetForm()">Reset</button>
-        </div>
-    </form>
+    <div class="actions">
+        <button type="submit">SUBMIT</button>
+        <button type="button" onclick="resetForm()">RESET</button>
+    </div>
+</form>
 
-    <script>
-        function dragstartHandler(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
+<script>
+    function dragstartHandler(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function dragoverHandler(ev) {
+        ev.preventDefault();
+    }
+
+    function dropHandler(ev) {
+        ev.preventDefault();
+        const draggedId = ev.dataTransfer.getData("text");
+        const draggedEl = document.getElementById(draggedId);
+        const dropzone = ev.currentTarget;
+
+        // Prevent dropping if already occupied
+        if (dropzone.querySelector('img'))
+            return;
+
+        //unhide the span text from the image's previous position (it it wasn't the container)
+        const previousDrop = draggedEl.closest('.dropzone');
+        if (previousDrop) {
+            const oldSpan = previousDrop.querySelector('span');
+            if (oldSpan) {
+                oldSpan.removeAttribute("hidden");
+            }
+            //Clear the QuestionId in the previous dropzone
+            const prevQuestionId = previousDrop.querySelector('input[type="hidden"][name$=".QuestionId"]');
+            if (prevQuestionId) {
+                prevQuestionId.value = "";
+            }
+            // Clear selected value in the previous dropzone
+            const prevSelected = previousDrop.querySelector('input[type="hidden"][name$=".SelectedValue"]');
+            if (prevSelected) {
+                prevSelected.value = "";
+            }
         }
 
-        function dragoverHandler(ev) {
-            ev.preventDefault();
+        //removing the new span
+        const newSpan = dropzone.querySelector('span');
+        newSpan.setAttribute("hidden", false);
+
+        // Set the QuestionId value in the new dropzone to match the image's
+        const inputQuestionId = dropzone.querySelector('input[type="hidden"][name$=".QuestionId"]');
+        inputQuestionId.value = draggedEl.id;
+        //Set whether its right or false into the Selected Value
+        const inputSelected = dropzone.querySelector('input[type="hidden"][name$=".SelectedValue"]');
+        if (draggedEl.getAttribute('data-match') === dropzone.id) {
+            inputSelected.value = "True";
+        } else {
+            inputSelected.value = "False";
         }
 
-        function dropHandler(ev) {
-            ev.preventDefault();
-            const draggedId = ev.dataTransfer.getData("text");
-            const draggedEl = document.getElementById(draggedId);
-            const dropzone = ev.currentTarget;
+        //add image to dropzone
+        dropzone.appendChild(draggedEl);
+    }
 
-            // Prevent dropping if already occupied
-            if (dropzone.querySelector('img')) 
-                return;
+    function resetForm() {
+        const palette = document.querySelector('.palette');
+        //clear all dropzones and move images back to palette
+        document.querySelectorAll('.dropzone').forEach(zone => {
+            const img = zone.querySelector('img');
+            if (img)
+                palette.appendChild(img);
+        });
+        //unhide all span texts
+        document.querySelectorAll('.droptext').forEach(span => {
+            if (span.hasAttribute('hidden')) {
+                span.removeAttribute('hidden');
+            }
+        });
+        // Clear all QuestionId hidden fields
+        document.querySelectorAll('input[type="hidden"][name$=".QuestionId"]').forEach(input => {
+            input.value = "";
+        });
+        //Clear all SelectedValue hidden fields
+        document.querySelectorAll('input[type="hidden"][name$=".SelectedValue"]').forEach(input => {
+            input.value = "";
+        });
+    }
 
-	        //unhide the span text from the image's previous position (it it wasn't the container)
-            const previousDrop = draggedEl.closest('.dropzone');
-            if (previousDrop) {
-                const oldSpan = previousDrop.querySelector('span');
-                if (oldSpan) {
-;                   oldSpan.removeAttribute("hidden");
-                }
-                //Clear the QuestionId in the previous dropzone
-                const prevQuestionId = previousDrop.querySelector('input[type="hidden"][name$=".QuestionId"]');
-                if (prevQuestionId) {
-                    prevQuestionId.value = "";
-                }
-                // Clear selected value in the previous dropzone
-                const prevSelected = previousDrop.querySelector('input[type="hidden"][name$=".SelectedValue"]');
-                if (prevSelected) {
-                    prevSelected.value = "";
-				}
+    //form submission code
+    document.getElementById('match-form').addEventListener('submit', function (e) {
+        //check all dropzones to see they are full
+        const zones = document.querySelectorAll('.dropzone');
+        let allFilled = true;
+        zones.forEach(zone => {
+            const img = zone.querySelector('img');
+            if (!img) {
+                allFilled = false;
+            }
+            if (!allFilled) {
+                alert('Not all boxes have been filled');
+                e.preventDefault();
+                return false;
             }
 
-            //removing the new span
-            const newSpan = dropzone.querySelector('span');
-            newSpan.setAttribute("hidden", false);
-
-            // Set the QuestionId value in the new dropzone to match the image's
-            const inputQuestionId = dropzone.querySelector('input[type="hidden"][name$=".QuestionId"]');
-            inputQuestionId.value = draggedEl.id;
-            //Set whether its right or false into the Selected Value
-            const inputSelected = dropzone.querySelector('input[type="hidden"][name$=".SelectedValue"]');
-            if (draggedEl.getAttribute('data-match') === dropzone.id) {
-                inputSelected.value = "True";
-            } else {
-                inputSelected.value = "False";
-		    }
-            
-            //add image to dropzone
-            dropzone.appendChild(draggedEl);
-        }
-
-        function resetForm() {
-            const palette = document.querySelector('.palette');
-			//clear all dropzones and move images back to palette
-            document.querySelectorAll('.dropzone').forEach(zone => {
-                const img = zone.querySelector('img');
-                if (img)
-                    palette.appendChild(img);
-            });
-			//unhide all span texts
-            document.querySelectorAll('.droptext').forEach(span => {
-                if (span.hasAttribute('hidden')) {
-                    span.removeAttribute('hidden');
-                }
-            });
-            // Clear all QuestionId hidden fields
-            document.querySelectorAll('input[type="hidden"][name$=".QuestionId"]').forEach(input => {
-                input.value = "";
-            });
-            //Clear all SelectedValue hidden fields
-            document.querySelectorAll('input[type="hidden"][name$=".SelectedValue"]').forEach(input => {
-                input.value = "";
-            });
-        }
-
-        //form submission code
-        document.getElementById('match-form').addEventListener('submit', function (e) {
-            //check all dropzones to see they are full
-            const zones = document.querySelectorAll('.dropzone');
-            let allFilled = true;
-            zones.forEach(zone => {
-                const img = zone.querySelector('img');
-                if (!img) {
-                    allFilled = false;
-                }
-                if (!allFilled) {
-                    alert('Not all boxes have been filled');
-                    e.preventDefault();
-                    return false;
-                }
-
-                //pre session input system
-                // const isCorrect = img && img.id === zone.dataset.accept;
-                // const input = document.createElement('input');
-                // input.type = 'hidden';
-                // input.name = zone.id;
-                // input.value = isCorrect;
-                // inputContainer.appendChild(input);
-            });
+            //pre session input system
+            // const isCorrect = img && img.id === zone.dataset.accept;
+            // const input = document.createElement('input');
+            // input.type = 'hidden';
+            // input.name = zone.id;
+            // input.value = isCorrect;
+            // inputContainer.appendChild(input);
         });
-
-    </script>
-
-</body>
-
-
-
-
-
-
-@* @model (List<ProjectSpetses.Models.Entities.Match_item>, List<string>)
-    
-@{
-    var matchItems = Model.Item1;
-    var dropList = Model.Item2;
-}
-
-<h1>Word Match Game</h1>
-
-<form asp-action="@nameof(GamesController.SubmitWordMatch)" method="post">
-
-    @foreach (var item in matchItems)
-    {
-        <img src="@item.Image" alt="/images/placeholder.png" style="width:150px; height:auto;"></img>
-        <select name="@item.Id">
-			<option value="">--Choose--</option>
-			@foreach (var option in dropList)
-			{
-                <option value="@(item.Solution == option ? "True" : "False")">@option</option>
-			}
-        </select>
-    }
-    <br>
-    <button type="submit">Submit</button>
-</form>
- *@
+    });
+</script>

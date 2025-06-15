@@ -12,8 +12,9 @@
     {
         if (Model.CompletedSectionIds.Contains(i))
         {
-            <a asp-action="@nameof(GamesController.StartGame)"
-               asp-route-sectionId="@i"
+            <a asp-action="@nameof(GamesController.StartGameConverter)"
+               asp-route-duration="5"
+               asp-route-sections="@i"
                asp-route-difficulty="easy"
                class="game-card-link">
                 <div class="game-card easy">
@@ -26,8 +27,9 @@
                 </div>
             </a>
 
-            <a asp-action="@nameof(GamesController.StartGame)"
-               asp-route-sectionId="@i"
+            <a asp-action="@nameof(GamesController.StartGameConverter)"
+               asp-route-duration="5"
+               asp-route-sections="@i"
                asp-route-difficulty="hard"
                class="game-card-link">
                 <div class="game-card hard">
@@ -72,18 +74,5 @@
                 </div>
             </a>
         }
-
     }
 </div>
-
-<footer class="border-top footer text-muted">
-    <div class="container">
-        Testing - 
-        <a asp-controller="Games" 
-           asp-action="@nameof(GamesController.StartGameConverter)"
-           asp-route-duration="5"
-		   asp-route-sections="1,2,3">
-           Testing initiation
-       </a>
-    </div>
-</footer>

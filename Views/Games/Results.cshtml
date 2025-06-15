@@ -1,40 +1,38 @@
 ﻿@model ProjectSpetses.Models.GameSubmissionViewModel
 
-<h2>Αποτελέσματα</h2>
+<link rel="stylesheet" href="~/css/results.css" />
 
-<div style="display: flex; align-items: center; gap: 10px;">
-    @foreach (var item in Model.Answers)
-    {
-        <span style="
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: @(item.SelectedValue == "True" ? "limegreen" : "crimson");
-            border: 2px solid #333;
-            margin-right: 5px;">
-        </span>
-    }
+<div class="results-container">
+    <h2>Αποτελέσματα</h2>
 
-	@{
-		var correctAnswers = 0;
-		var totalAnswers = Model.Answers.Count;
-	}
-	@foreach (var item in Model.Answers)
-	{
-		if (item.SelectedValue == "True")
-		{
-			correctAnswers++;
-		}
-	}
-    <span>
-        <br>
-		@correctAnswers / @totalAnswers
-        <br />
-    </span>
-    <a
-       asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
-       asp-action="@nameof(HomeController.Index)">
-        Επιστροφή στην Αρχική Σελίδα
-    </a>
+    <div class="results-content">
+        <div class="answer-indicators">
+            @foreach (var item in Model.Answers)
+            {
+                <span class="indicator @(item.SelectedValue == "True" ? "correct" : "incorrect")"></span>
+            }
+        </div>
+
+        @{
+            var correctAnswers = 0;
+            var totalAnswers = Model.Answers.Count;
+        }
+        @foreach (var item in Model.Answers)
+        {
+            if (item.SelectedValue == "True")
+            {
+                correctAnswers++;
+            }
+        }
+
+        <div class="score-display">
+            <span class="score">@correctAnswers / @totalAnswers</span>
+        </div>
+
+        <a class="btn-return"
+           asp-controller="@nameof(HomeController)[..nameof(HomeController).LastIndexOf("Controller")]"
+           asp-action="@nameof(HomeController.Index)">
+            Επιστροφή στην Αρχική Σελίδα
+        </a>
+    </div>
 </div>

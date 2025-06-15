@@ -1,21 +1,29 @@
 ﻿@model ProjectSpetses.Models.Entities.Blank_item
 
+<link rel="stylesheet" href="~/css/quiz.css" />
+
 <h1>Fill the blanks!</h1>
 <form asp-action="@nameof(GamesController.SubmitFillBlank)" method="post">
 
     <div>
-        <h3>@Model.Description1 ____ @Model.Description2</h3>
+        <h3>
+            <span id="desc1">@Model.Description1</span>
+            <span id="blank"> ____ </span>
+            <span id="desc2">@Model.Description2</span>
+        </h3>
         <input type="hidden" name="Answers[0].QuestionId" value="@Model.Id" />
         <input type="hidden" name="Answers[0].GameType" value="FillBlank" />
-        <ul>
+        <ul class="item-list">
             @foreach (var answer in Model.Answers)
             {
-                <li>
+                <li class="item">
                     <input type="radio"
                            id="@Model.Id@answer"
                            name="Answers[0].SelectedValue"
                            value="@(Model.Solution == answer ? "True" : "False")"
-                           required />
+                           data-answer-text="@answer"
+                           required
+                           onchange="updateBlankText(this)" />
                     <label for="@Model.Id@answer">
                         @answer
                     </label>
@@ -24,28 +32,27 @@
         </ul>
     </div>
 
-    <button type="submit">Submit</button>
+    <button type="submit">SUBMIT</button>
 </form>
 
-@* @model List<ProjectSpetses.Models.Entities.Blank_item>
+<script>
+    function updateBlankText(radio) {
+        var blankSpan = document.getElementById('blank');
+        if (radio.checked) {
+            blankSpan.textContent = ' ' + radio.getAttribute('data-answer-text') + ' ';
+        }
+    }
 
-@foreach (var quiz in Model)
-{
-    <div>
-        <h3>@quiz.Description1 ____ @quiz.Description2</h3>
-        <ul>
-            @foreach (var answer in quiz.Answers)
-            {
-                <li>
-                    <input type="radio"
-                           id="@quiz.Id@answer"
-                           name="@quiz.Id"
-                           value="@(quiz.Solution == answer ? "True" : "False")"
-                           required />
-                    <!-- The Value is visible if you inspect the browser page, this is a feature -->
-                    <label for="@quiz.Id@answer">@answer</label>
-                </li>
+    //if any radio is checked, update the blank
+    document.addEventListener('DOMContentLoaded', function () {
+        var radios = document.querySelectorAll('input[type="radio"][name="Answers[0].SelectedValue"]');
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                updateBlankText(radio);
+            });
+            if (radio.checked) {
+                updateBlankText(radio);
             }
-        </ul>
-    </div>
-} *@
+        });
+    });
+</script>

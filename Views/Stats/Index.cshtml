@@ -6,8 +6,6 @@
 <link rel="stylesheet" href="~/css/stats.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-
-
 <div class="row justify-content-center mb-5">
     <div class="col-lg-8">
         <div class="progress-card slide-up">
@@ -49,11 +47,10 @@
                     <div class="detail-item">
                         
                         <span class="detail-label"><i class="fas fa-balance-scale text-secondary"></i>Λόγος (Σωστές/Λάθος):</span>
-                        <span class="detail-value">@(Model.WrongAnswers != 0 ? Model.CorrectAnswers / Model.WrongAnswers : "0")</span>
+                        <span class="detail-value">@(Model.WrongAnswers != 0 ? (float)Model.CorrectAnswers / (float)Model.WrongAnswers : "0")</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
