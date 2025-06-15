@@ -21,6 +21,7 @@ namespace ProjectSpetses.Data
         public DbSet<Quiz_item> Quiz_items { get; set; }
         public DbSet<Blank_item> Blank_items { get; set; }
         public DbSet<Match_item> Match_items { get; set; }
+        public DbSet<PointsEarned> PointsEarned { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,10 @@ namespace ProjectSpetses.Data
 
             modelBuilder.Entity<Match_item>()
                 .HasKey(c => c.Id);
+
+            modelBuilder.Entity<PointsEarned>()
+                .HasKey(p => p.Id);
+
 
             modelBuilder.Entity<Stats>().HasOne(s => s.User)
                 .WithOne(s => s.Stats)
@@ -98,6 +103,10 @@ namespace ProjectSpetses.Data
                 .HasConversion(
                     v => v == null ? null : JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                     v => v == null ? new List<StatAnswerViewModel>() : JsonSerializer.Deserialize<List<StatAnswerViewModel>>(v, (JsonSerializerOptions?)null)!);
+
+            modelBuilder.Entity<PointsEarned>().HasOne(p => p.User)
+                .WithOne(p => p.PointsEarned)
+                .HasForeignKey<PointsEarned>(s => s.Id);
 
 
             base.OnModelCreating(modelBuilder);

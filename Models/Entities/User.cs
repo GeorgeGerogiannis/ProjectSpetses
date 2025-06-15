@@ -12,5 +12,6 @@ namespace ProjectSpetses.Models.Entities
         public required string Salt { get; set; }
 
         public Stats Stats { get; set; }
+        public PointsEarned PointsEarned { get; set; }
     }
 }

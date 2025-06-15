@@ -114,9 +114,23 @@ namespace ProjectSpetses.Controllers
                 WrongAnswers = []
             };
 
+            var pointsEarned = new PointsEarned
+            {
+                Id = userId,
+                Section1Easy = 0,
+                Section1Hard = 0,
+                Section2Easy = 0,
+                Section2Hard = 0,
+                Section3Easy = 0,
+                Section3Hard = 0,
+                Section4Easy = 0,
+                Section4Hard = 0
+            };
+
             //add the user and the stats to the database
             await _dbContext.Users.AddAsync(newUser);
             await _dbContext.Stats.AddAsync(stats);
+            await _dbContext.PointsEarned.AddAsync(pointsEarned);
             await _dbContext.SaveChangesAsync();
 
             //sign in the user
